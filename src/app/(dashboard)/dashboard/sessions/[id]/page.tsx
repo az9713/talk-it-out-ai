@@ -5,7 +5,6 @@ import { useParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Send, Bot, User, AlertTriangle } from 'lucide-react';
 
@@ -99,8 +98,8 @@ export default function SessionPage() {
   return (
     <div className="flex flex-col h-[calc(100vh-8rem)]">
       <Card className="flex-1 flex flex-col overflow-hidden">
-        <ScrollArea className="flex-1 p-4" ref={scrollRef}>
-          <div className="space-y-4">
+        <div className="flex-1 overflow-y-auto p-4" ref={scrollRef}>
+          <div className="space-y-4 max-w-4xl mx-auto">
             {messages.map((message) => (
               <div
                 key={message.id}
@@ -145,7 +144,7 @@ export default function SessionPage() {
               </div>
             )}
           </div>
-        </ScrollArea>
+        </div>
 
         {error && (
           <div className="mx-4 mb-2 p-3 bg-yellow-50 border border-yellow-200 rounded-lg flex items-center gap-2 text-yellow-800">
