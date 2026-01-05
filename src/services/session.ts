@@ -105,6 +105,18 @@ export async function getSessionMessages(sessionId: string) {
   });
 }
 
+export async function getSessionCounts(userId: string) {
+  const userSessions = await db.query.sessions.findMany({
+    where: eq(sessions.initiatorId, userId),
+  });
+
+  const active = userSessions.filter(s => s.status === 'active').length;
+  const completed = userSessions.filter(s => s.status === 'completed').length;
+  const paused = userSessions.filter(s => s.status === 'paused').length;
+
+  return { active, completed, paused, total: userSessions.length };
+}
+
 export async function savePerspective(
   sessionId: string,
   userId: string,

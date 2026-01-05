@@ -94,6 +94,20 @@ export async function endPartnership(partnershipId: string, userId: string) {
   return updated;
 }
 
+export async function getPartnershipCount(userId: string) {
+  const userPartnerships = await db.query.partnerships.findMany({
+    where: and(
+      or(
+        eq(partnerships.user1Id, userId),
+        eq(partnerships.user2Id, userId)
+      ),
+      eq(partnerships.status, 'active')
+    ),
+  });
+
+  return userPartnerships.length;
+}
+
 export async function getPartner(partnershipId: string, userId: string) {
   const partnership = await getPartnership(partnershipId);
 

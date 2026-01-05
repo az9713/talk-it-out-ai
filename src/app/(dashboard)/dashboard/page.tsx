@@ -3,9 +3,20 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Heart, MessageCircle, Users, Plus } from 'lucide-react';
 import Link from 'next/link';
+import { getSessionCounts } from '@/services/session';
+import { getPartnershipCount } from '@/services/partnership';
 
 export default async function DashboardPage() {
   const session = await auth();
+
+  // Get real counts from database
+  const sessionCounts = session?.user?.id
+    ? await getSessionCounts(session.user.id)
+    : { active: 0, completed: 0, paused: 0, total: 0 };
+
+  const partnerCount = session?.user?.id
+    ? await getPartnershipCount(session.user.id)
+    : 0;
 
   return (
     <div className="space-y-8">
@@ -23,7 +34,7 @@ export default async function DashboardPage() {
             <MessageCircle className="h-4 w-4 text-gray-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">0</div>
+            <div className="text-2xl font-bold">{sessionCounts.active}</div>
             <p className="text-xs text-gray-500">Ongoing conversations</p>
           </CardContent>
         </Card>
@@ -34,7 +45,7 @@ export default async function DashboardPage() {
             <Heart className="h-4 w-4 text-gray-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">0</div>
+            <div className="text-2xl font-bold">{sessionCounts.completed}</div>
             <p className="text-xs text-gray-500">Resolved conflicts</p>
           </CardContent>
         </Card>
@@ -45,7 +56,7 @@ export default async function DashboardPage() {
             <Users className="h-4 w-4 text-gray-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">0</div>
+            <div className="text-2xl font-bold">{partnerCount}</div>
             <p className="text-xs text-gray-500">Connected partners</p>
           </CardContent>
         </Card>
