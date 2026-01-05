@@ -1,0 +1,91 @@
+import { auth } from '@/lib/auth';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Heart, MessageCircle, Users, Plus } from 'lucide-react';
+import Link from 'next/link';
+
+export default async function DashboardPage() {
+  const session = await auth();
+
+  return (
+    <div className="space-y-8">
+      <div>
+        <h1 className="text-3xl font-bold">Welcome back, {session?.user?.name || 'friend'}</h1>
+        <p className="text-gray-600 mt-2">
+          Ready to improve your communication? Start a new session or continue where you left off.
+        </p>
+      </div>
+
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium">Active Sessions</CardTitle>
+            <MessageCircle className="h-4 w-4 text-gray-400" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">0</div>
+            <p className="text-xs text-gray-500">Ongoing conversations</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium">Completed Sessions</CardTitle>
+            <Heart className="h-4 w-4 text-gray-400" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">0</div>
+            <p className="text-xs text-gray-500">Resolved conflicts</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium">Partners</CardTitle>
+            <Users className="h-4 w-4 text-gray-400" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">0</div>
+            <p className="text-xs text-gray-500">Connected partners</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid gap-6 md:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle>Start a New Session</CardTitle>
+            <CardDescription>
+              Begin a guided conversation to work through a conflict using NVC techniques.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Link href="/dashboard/sessions/new">
+              <Button className="w-full">
+                <Plus className="h-4 w-4 mr-2" />
+                New Session
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Invite a Partner</CardTitle>
+            <CardDescription>
+              Connect with your partner or teammate to start resolving conflicts together.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Link href="/dashboard/partners">
+              <Button variant="outline" className="w-full">
+                <Users className="h-4 w-4 mr-2" />
+                Manage Partners
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}

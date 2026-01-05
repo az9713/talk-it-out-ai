@@ -1,0 +1,178 @@
+import Anthropic from '@anthropic-ai/sdk';
+import { SYSTEM_PROMPT, STAGE_PROMPTS, SAFETY_PROMPT, CRISIS_RESOURCES } from './prompts';
+import type { SessionStage, Message, AIResponse } from '@/types';
+
+const anthropic = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY,
+});
+
+interface SafetyCheckResult {
+  safe: boolean;
+  concerns: {
+    crisis: boolean;
+    abuse: boolean;
+    escalation: boolean;
+  };
+  reason?: string;
+}
+
+export async function checkSafety(message: string): Promise<SafetyCheckResult> {
+  try {
+    const response = await anthropic.messages.create({
+      model: 'claude-3-5-haiku-20241022',
+      max_tokens: 256,
+      messages: [
+        {
+          role: 'user',
+          content: `${SAFETY_PROMPT}\n\nMessage to analyze: "${message}"`,
+        },
+      ],
+    });
+
+    const text = response.content[0].type === 'text' ? response.content[0].text : '';
+    const parsed = JSON.parse(text);
+    return parsed as SafetyCheckResult;
+  } catch {
+    // Default to safe if parsing fails
+    return { safe: true, concerns: { crisis: false, abuse: false, escalation: false } };
+  }
+}
+
+export async function generateResponse(
+  messages: Message[],
+  currentStage: SessionStage,
+  userMessage: string
+): Promise<AIResponse> {
+  // Check safety first
+  const safetyCheck = await checkSafety(userMessage);
+
+  if (!safetyCheck.safe) {
+    if (safetyCheck.concerns.crisis) {
+      return {
+        message: CRISIS_RESOURCES,
+        safetyAlert: { type: 'crisis', message: 'Crisis indicators detected' },
+      };
+    }
+    if (safetyCheck.concerns.abuse) {
+      return {
+        message: CRISIS_RESOURCES,
+        safetyAlert: { type: 'abuse', message: 'Potential abuse indicators detected' },
+      };
+    }
+    if (safetyCheck.concerns.escalation) {
+      return {
+        message: `I notice things are getting heated. Let's take a moment to breathe.
+
+Remember, the goal isn't to win - it's to understand each other better. Would you like to:
+1. Take a short break and come back in a few minutes
+2. Rephrase your thoughts more calmly
+3. Move to a different aspect of the situation
+
+What feels right to you?`,
+        safetyAlert: { type: 'escalation', message: 'Escalation detected' },
+      };
+    }
+  }
+
+  // Build conversation history for Claude
+  const conversationHistory = messages.map((msg) => ({
+    role: msg.role as 'user' | 'assistant',
+    content: msg.content,
+  }));
+
+  // Add the current user message
+  conversationHistory.push({
+    role: 'user',
+    content: userMessage,
+  });
+
+  const stagePrompt = STAGE_PROMPTS[currentStage] || '';
+
+  try {
+    const response = await anthropic.messages.create({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1024,
+      system: `${SYSTEM_PROMPT}\n\nCurrent stage: ${currentStage}\n\n${stagePrompt}`,
+      messages: conversationHistory,
+    });
+
+    const text = response.content[0].type === 'text' ? response.content[0].text : '';
+
+    // Determine next stage based on response and current stage
+    const nextStage = determineNextStage(currentStage, text);
+
+    return {
+      message: text,
+      nextStage: nextStage !== currentStage ? nextStage : undefined,
+    };
+  } catch (error) {
+    console.error('AI response error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    throw new Error(`Failed to generate response: ${errorMessage}`);
+  }
+}
+
+function determineNextStage(currentStage: SessionStage, response: string): SessionStage {
+  const stageOrder: SessionStage[] = [
+    'intake',
+    'person_a_observation',
+    'person_a_feeling',
+    'person_a_need',
+    'person_a_request',
+    'reflection_a',
+    'person_b_observation',
+    'person_b_feeling',
+    'person_b_need',
+    'person_b_request',
+    'reflection_b',
+    'common_ground',
+    'agreement',
+    'complete',
+  ];
+
+  const currentIndex = stageOrder.indexOf(currentStage);
+
+  // Look for indicators in the response that we should move to next stage
+  const progressIndicators = [
+    'thank you for sharing',
+    "let's move on",
+    'now that we have',
+    "let's hear from",
+    'person b',
+    'next step',
+    'summarize',
+    'agreement',
+    'conclude',
+  ];
+
+  const shouldProgress = progressIndicators.some((indicator) =>
+    response.toLowerCase().includes(indicator)
+  );
+
+  if (shouldProgress && currentIndex < stageOrder.length - 1) {
+    return stageOrder[currentIndex + 1];
+  }
+
+  return currentStage;
+}
+
+export async function generateWelcome(): Promise<string> {
+  try {
+    const response = await anthropic.messages.create({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 512,
+      system: SYSTEM_PROMPT,
+      messages: [
+        {
+          role: 'user',
+          content: 'Start a new conflict resolution session. Greet the participants warmly and ask them to describe the situation they want to work through.',
+        },
+      ],
+    });
+
+    return response.content[0].type === 'text' ? response.content[0].text : '';
+  } catch (error) {
+    console.error('Welcome message error:', error);
+    return "Welcome! I'm here to help you work through a conflict using guided communication techniques. What situation would you like to discuss today?";
+  }
+}
