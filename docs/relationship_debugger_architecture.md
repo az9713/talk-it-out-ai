@@ -1,10 +1,12 @@
 # Technical Architecture Document
-## Relationship-Debugger Bot
+## Relationship-Debugger Bot (Now: Talk-It-Out-AI)
+
+> **Note:** This is the original architecture document created during the BMAD Phase 3 solutioning process. The project was subsequently renamed to **Talk-It-Out-AI**. This document is preserved for historical reference and to demonstrate the BMAD methodology workflow.
 
 **Project ID:** #86
 **Version:** 1.0
 **Date:** 2026-01-04
-**Phase:** BMAD Phase 3 - Solutioning
+**Phase:** BMAD Phase 3 - Solutioning (Historical)
 
 ---
 

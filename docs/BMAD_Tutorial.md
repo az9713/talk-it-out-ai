@@ -310,7 +310,7 @@ CREATE TABLE users (
     created_at TIMESTAMP DEFAULT NOW()
 );
 
--- Conflicts table (for our Relationship-Debugger)
+-- Conflicts table (for our Talk-It-Out-AI app)
 CREATE TABLE conflicts (
     id SERIAL PRIMARY KEY,
     user1_id INT REFERENCES users(id),
@@ -566,13 +566,13 @@ npx bmad-method@alpha install
 
 ### Step-by-Step Workflow
 
-Here's how to use BMAD for Project #86 (Relationship-Debugger Bot):
+Here's how to use BMAD for a conflict resolution app like Talk-It-Out-AI:
 
 #### Step 1: Initialize Project
 ```bash
 # Create project directory
-mkdir relationship-debugger
-cd relationship-debugger
+mkdir talk-it-out-ai
+cd talk-it-out-ai
 
 # Initialize Git
 git init
@@ -585,7 +585,7 @@ npx bmad-method@alpha install
 Load the Analyst agent and provide your idea:
 
 ```
-Human: I want to build a "Relationship-Debugger Bot" - an AI mediator
+Human: I want to build "Talk-It-Out-AI" - an AI mediator
 that helps couples or teams resolve conflicts using therapy dialogue
 techniques.
 
@@ -1260,7 +1260,7 @@ app.listen(PORT, '0.0.0.0', () => {
 // File: package.json - Add start script
 
 {
-    "name": "relationship-debugger",
+    "name": "talk-it-out-ai",
     "version": "1.0.0",
     "scripts": {
         "start": "node src/server.js",
@@ -1314,7 +1314,7 @@ module.exports = {
 
 #### Step 6: Get Your URL
 
-Railway provides a URL like: `https://relationship-debugger-production.up.railway.app`
+Railway provides a URL like: `https://talk-it-out-ai-production.up.railway.app`
 
 ### Environment Variables Explained
 

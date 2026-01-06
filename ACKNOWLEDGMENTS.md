@@ -55,7 +55,7 @@ The PRD generated through BMAD defined:
 - Functional and non-functional requirements
 - Epic breakdown and prioritization
 
-See [docs/relationship_debugger_PRD.md](docs/relationship_debugger_PRD.md) for the complete PRD.
+See [docs/relationship_debugger_PRD.md](docs/relationship_debugger_PRD.md) for the original PRD (the project was later renamed to Talk-It-Out-AI).
 
 ### Superpowers Plugin Skills
 

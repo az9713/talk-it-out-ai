@@ -29,7 +29,7 @@ Talk-It-Out-AI facilitates structured dialogues in personal conflicts by orchest
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/your-repo/talk-it-out-ai.git
+git clone https://github.com/az9713/talk-it-out-ai.git
 cd talk-it-out-ai
 
 # 2. Install dependencies
@@ -78,8 +78,8 @@ ANTHROPIC_API_KEY=sk-ant-api03-your-key-here
 | [User Guide](docs/USER_GUIDE.md) | Complete user documentation | All users |
 | [Developer Guide](docs/DEVELOPER_GUIDE.md) | Technical documentation for developers | Developers |
 | [Neon DB Setup](docs/NEON_DB_SETUP.md) | Detailed database setup guide | Developers |
-| [PRD](docs/relationship_debugger_PRD.md) | Product Requirements Document | Product/Dev |
-| [Architecture](docs/relationship_debugger_architecture.md) | Technical architecture | Developers |
+| [PRD](docs/relationship_debugger_PRD.md) | Product Requirements Document (Historical) | Product/Dev |
+| [Architecture](docs/relationship_debugger_architecture.md) | Technical architecture (Historical) | Developers |
 | [BMAD Tutorial](docs/BMAD_Tutorial.md) | BMAD methodology overview | All |
 | [CLAUDE.md](CLAUDE.md) | AI assistant context | AI/Developers |
 | [Acknowledgments](ACKNOWLEDGMENTS.md) | Credits and methodology | All |
