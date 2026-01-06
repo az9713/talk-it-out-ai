@@ -1,10 +1,10 @@
-# CLAUDE.md - AI Assistant Context for Relationship Debugger
+# CLAUDE.md - AI Assistant Context for Talk-It-Out-AI
 
 This file provides context for AI assistants (like Claude) working on this codebase.
 
 ## Project Overview
 
-**Relationship Debugger** is an AI-powered conflict resolution application that helps couples and teams work through disagreements using Nonviolent Communication (NVC) principles. It acts as a neutral mediator, guiding users through structured dialogue to understand each other's feelings and needs.
+**Talk-It-Out-AI** is an AI-powered conflict resolution application that facilitates structured dialogues in personal conflicts using therapeutic dialogue techniques. It helps couples and teams work through disagreements using Nonviolent Communication (NVC) principles, acting as a neutral mediator guiding users through structured dialogue to understand each other's feelings and needs.
 
 ## Tech Stack
 
@@ -23,7 +23,7 @@ This file provides context for AI assistants (like Claude) working on this codeb
 ## Project Structure
 
 ```
-relationship-debugger/
+talk-it-out-ai/
 ├── src/
 │   ├── app/                    # Next.js App Router pages
 │   │   ├── (auth)/            # Auth pages (login, signup)

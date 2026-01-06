@@ -1,4 +1,4 @@
-# Developer Guide - Relationship Debugger
+# Developer Guide - Talk-It-Out-AI
 
 A comprehensive guide for developers with C/C++/Java background who are new to full-stack web development.
 
@@ -41,7 +41,7 @@ If you're coming from traditional compiled languages, here's what's different in
 
 ### What is This Project?
 
-Relationship Debugger is a **full-stack web application** that:
+Talk-It-Out-AI is a **full-stack web application** that:
 1. Runs in a web browser (no installation needed)
 2. Uses AI (Claude) to mediate conversations
 3. Stores data in a cloud database
@@ -245,7 +245,7 @@ const user = await db.query.users.findFirst({
 ## Project Structure
 
 ```
-relationship-debugger/
+talk-it-out-ai/
 ├── src/
 │   ├── app/                      # Next.js App Router
 │   │   ├── (auth)/              # Route group for auth pages
@@ -390,10 +390,10 @@ npm --version
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-repo/relationship-debugger.git
+git clone https://github.com/your-repo/talk-it-out-ai.git
 
 # Navigate to project directory
-cd relationship-debugger
+cd talk-it-out-ai
 
 # Install dependencies
 npm install

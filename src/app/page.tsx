@@ -11,7 +11,7 @@ export default function LandingPage() {
         <nav className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Heart className="h-8 w-8 text-rose-500" />
-            <span className="text-xl font-bold">Relationship Debugger</span>
+            <span className="text-xl font-bold">Talk It Out AI</span>
           </div>
           <div className="flex items-center gap-4">
             <Link href="/login" className="text-gray-600 hover:text-gray-900">
@@ -50,7 +50,7 @@ export default function LandingPage() {
       {/* Features Section */}
       <section className="container mx-auto px-4 py-20">
         <h2 className="text-3xl font-bold text-center mb-12">
-          Why Relationship Debugger?
+          Why Talk It Out AI?
         </h2>
         <div className="grid md:grid-cols-3 gap-8">
           <Card>
@@ -156,7 +156,7 @@ export default function LandingPage() {
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <Heart className="h-6 w-6 text-rose-500" />
-            <span className="font-semibold">Relationship Debugger</span>
+            <span className="font-semibold">Talk It Out AI</span>
           </div>
           <p className="text-gray-500 text-sm">
             This is not a substitute for professional therapy. If you are in crisis,

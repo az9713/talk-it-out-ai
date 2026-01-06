@@ -1,10 +1,10 @@
-# User Guide - Relationship Debugger
+# User Guide - Talk-It-Out-AI
 
-A complete guide to using Relationship Debugger for conflict resolution and better communication.
+A complete guide to using Talk-It-Out-AI for conflict resolution and better communication.
 
 ## Table of Contents
 
-1. [What is Relationship Debugger?](#what-is-relationship-debugger)
+1. [What is Talk-It-Out-AI?](#what-is-talk-it-out-ai)
 2. [Getting Started](#getting-started)
 3. [Understanding NVC](#understanding-nvc)
 4. [Creating Your Account](#creating-your-account)
@@ -22,9 +22,9 @@ A complete guide to using Relationship Debugger for conflict resolution and bett
 
 ---
 
-## What is Relationship Debugger?
+## What is Talk-It-Out-AI?
 
-Relationship Debugger is an AI-powered application that helps you work through conflicts and improve communication using a proven method called **Nonviolent Communication (NVC)**.
+Talk-It-Out-AI is an AI-powered application that helps you work through conflicts and improve communication using a proven method called **Nonviolent Communication (NVC)**.
 
 ### Who is it for?
 
@@ -72,7 +72,7 @@ The app acts as a **neutral AI mediator** that:
 
 ## Understanding NVC
 
-Relationship Debugger uses **Nonviolent Communication (NVC)**, a communication framework developed by psychologist Marshall Rosenberg.
+Talk-It-Out-AI uses **Nonviolent Communication (NVC)**, a communication framework developed by psychologist Marshall Rosenberg.
 
 ### The Four Components of NVC
 
@@ -352,7 +352,7 @@ You'll create:
 
 ### What is a Partner?
 
-A "partner" in Relationship Debugger is someone you've connected with to participate in sessions together. This could be:
+A "partner" in Talk-It-Out-AI is someone you've connected with to participate in sessions together. This could be:
 - A romantic partner
 - A family member
 - A roommate
@@ -525,7 +525,7 @@ Consider professional support if:
 A: Yes. Your sessions are stored securely and only accessible to you and any partners you've invited to that specific session.
 
 **Q: Can I use this instead of therapy?**
-A: Relationship Debugger is a helpful tool, but it's not a replacement for professional therapy. Consider it a supplement to, not a substitute for, professional help when needed.
+A: Talk-It-Out-AI is a helpful tool, but it's not a replacement for professional therapy. Consider it a supplement to, not a substitute for, professional help when needed.
 
 **Q: How long does a typical session take?**
 A: Most sessions take 15-30 minutes, but you can pause and return anytime. Complex topics may require multiple sessions.
@@ -638,4 +638,4 @@ We welcome your feedback to improve the application. Use the feedback option in 
 
 ---
 
-Thank you for using Relationship Debugger. We hope it helps you build stronger, more understanding relationships.
+Thank you for using Talk-It-Out-AI. We hope it helps you build stronger, more understanding relationships.

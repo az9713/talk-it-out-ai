@@ -1,6 +1,6 @@
-# Quick Start Guide - Relationship Debugger
+# Quick Start Guide - Talk-It-Out-AI
 
-Get up and running with Relationship Debugger in minutes. This guide includes **10 hands-on use cases** to help you master the app quickly.
+Get up and running with Talk-It-Out-AI in minutes. This guide includes **10 hands-on use cases** to help you master the app quickly.
 
 ---
 
@@ -27,7 +27,7 @@ Your dashboard shows:
 2. Enter a topic (try: "Understanding my communication style")
 3. Click **"Start Session"**
 4. Respond to the AI's questions
-5. You're now using Relationship Debugger!
+5. You're now using Talk-It-Out-AI!
 
 ---
 
@@ -490,4 +490,4 @@ For more detailed information, see:
 
 ---
 
-**Congratulations!** You now have the foundation to use Relationship Debugger effectively. Remember: the goal isn't to "win" conflicts, but to understand each other better and find solutions that work for everyone.
+**Congratulations!** You now have the foundation to use Talk-It-Out-AI effectively. Remember: the goal isn't to "win" conflicts, but to understand each other better and find solutions that work for everyone.

@@ -40,7 +40,7 @@ export function DashboardNav({ user }: DashboardNavProps) {
       <div className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-white border-b z-50 flex items-center justify-between px-4">
         <Link href="/dashboard" className="flex items-center gap-2">
           <Heart className="h-6 w-6 text-rose-500" />
-          <span className="font-semibold">Relationship Debugger</span>
+          <span className="font-semibold">Talk It Out AI</span>
         </Link>
         <Button variant="ghost" size="icon" onClick={() => setMobileOpen(!mobileOpen)}>
           {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -84,7 +84,7 @@ export function DashboardNav({ user }: DashboardNavProps) {
         <div className="flex flex-col flex-1 min-h-0">
           <div className="flex items-center gap-2 h-16 px-6 border-b">
             <Heart className="h-6 w-6 text-rose-500" />
-            <span className="font-semibold">Relationship Debugger</span>
+            <span className="font-semibold">Talk It Out AI</span>
           </div>
 
           <nav className="flex-1 px-4 py-4 space-y-1">

@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Relationship Debugger",
-  description: "AI-powered conflict resolution using NVC therapy techniques",
+  title: "Talk It Out AI",
+  description: "AI-guided conflict resolution using therapeutic dialogue techniques",
 };
 
 export default function RootLayout({
