@@ -80,7 +80,7 @@ ANTHROPIC_API_KEY=sk-ant-api03-your-key-here
 | [Neon DB Setup](docs/NEON_DB_SETUP.md) | Detailed database setup guide | Developers |
 | [PRD](docs/relationship_debugger_PRD.md) | Product Requirements Document (Historical) | Product/Dev |
 | [Architecture](docs/relationship_debugger_architecture.md) | Technical architecture (Historical) | Developers |
-| [BMAD Tutorial](docs/BMAD_Tutorial.md) | BMAD methodology overview | All |
+| [BMAD Tutorial](docs/bmad_tutorial_canonical.md) | BMAD methodology overview | All |
 | [CLAUDE.md](CLAUDE.md) | AI assistant context | AI/Developers |
 | [Acknowledgments](ACKNOWLEDGMENTS.md) | Credits and methodology | All |
 
