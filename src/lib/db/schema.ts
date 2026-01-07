@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, boolean, pgEnum } from 'drizzle-orm/pg-core';
+import { pgTable, text, timestamp, boolean, pgEnum, integer } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
 // Enums
@@ -36,6 +36,17 @@ export const partnershipStatusEnum = pgEnum('partnership_status', [
   'pending',
   'active',
   'ended',
+]);
+
+export const templateCategoryEnum = pgEnum('template_category', [
+  'household',
+  'finances',
+  'communication',
+  'parenting',
+  'work',
+  'boundaries',
+  'intimacy',
+  'other',
 ]);
 
 // Users table (for NextAuth)
@@ -124,6 +135,21 @@ export const agreements = pgTable('agreements', {
   createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
 });
 
+// Session templates table
+export const sessionTemplates = pgTable('session_templates', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  userId: text('user_id').references(() => users.id, { onDelete: 'cascade' }), // null = system template
+  name: text('name').notNull(),
+  description: text('description'),
+  category: templateCategoryEnum('category').notNull(),
+  promptContext: text('prompt_context').notNull(), // Pre-filled situation description
+  suggestedOpening: text('suggested_opening'), // Suggested first message
+  isSystem: boolean('is_system').default(false).notNull(), // System-provided templates
+  usageCount: integer('usage_count').default(0).notNull(),
+  createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { mode: 'date' }).defaultNow().notNull(),
+});
+
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
   accounts: many(accounts),
@@ -132,6 +158,7 @@ export const usersRelations = relations(users, ({ many }) => ({
   initiatedSessions: many(sessions, { relationName: 'initiator' }),
   perspectives: many(perspectives),
   messages: many(messages),
+  templates: many(sessionTemplates),
 }));
 
 export const partnershipsRelations = relations(partnerships, ({ one, many }) => ({
@@ -161,4 +188,8 @@ export const perspectivesRelations = relations(perspectives, ({ one }) => ({
 
 export const agreementsRelations = relations(agreements, ({ one }) => ({
   session: one(sessions, { fields: [agreements.sessionId], references: [sessions.id] }),
+}));
+
+export const sessionTemplatesRelations = relations(sessionTemplates, ({ one }) => ({
+  user: one(users, { fields: [sessionTemplates.userId], references: [users.id] }),
 }));

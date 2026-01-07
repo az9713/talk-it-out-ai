@@ -1,24 +1,27 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card } from '@/components/ui/card';
 import { Loader2 } from 'lucide-react';
+import { TemplatePickerDialog } from '@/components/template-picker-dialog';
+import { Template } from '@/components/template-card';
 
 export default function NewSessionPage() {
   const router = useRouter();
+  const [showPicker, setShowPicker] = useState(true);
+  const [creating, setCreating] = useState(false);
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    createSession();
-  }, []);
+  async function createSession(templateId?: string) {
+    setCreating(true);
+    setError('');
 
-  async function createSession() {
     try {
       const res = await fetch('/api/sessions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({}),
+        body: JSON.stringify({ templateId }),
       });
 
       if (!res.ok) {
@@ -30,8 +33,19 @@ export default function NewSessionPage() {
       router.replace(`/dashboard/sessions/${session.id}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create session');
+      setCreating(false);
     }
   }
+
+  const handleTemplateSelect = (template: Template) => {
+    setShowPicker(false);
+    createSession(template.id);
+  };
+
+  const handleStartBlank = () => {
+    setShowPicker(false);
+    createSession();
+  };
 
   if (error) {
     return (
@@ -41,7 +55,7 @@ export default function NewSessionPage() {
           <button
             onClick={() => {
               setError('');
-              createSession();
+              setShowPicker(true);
             }}
             className="text-rose-500 hover:underline"
           >
@@ -52,12 +66,35 @@ export default function NewSessionPage() {
     );
   }
 
+  if (creating) {
+    return (
+      <div className="flex items-center justify-center h-[calc(100vh-8rem)]">
+        <Card className="p-6 text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-rose-500" />
+          <p className="text-gray-600">Creating your session...</p>
+        </Card>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex items-center justify-center h-[calc(100vh-8rem)]">
-      <Card className="p-6 text-center">
-        <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-rose-500" />
-        <p className="text-gray-600">Creating your session...</p>
-      </Card>
-    </div>
+    <>
+      <div className="flex items-center justify-center h-[calc(100vh-8rem)]">
+        <Card className="p-6 text-center">
+          <p className="text-gray-600">Select a template to start your session...</p>
+        </Card>
+      </div>
+
+      <TemplatePickerDialog
+        open={showPicker}
+        onOpenChange={(open) => {
+          if (!open) {
+            router.back();
+          }
+        }}
+        onSelect={handleTemplateSelect}
+        onStartBlank={handleStartBlank}
+      />
+    </>
   );
 }
