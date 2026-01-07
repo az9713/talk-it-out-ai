@@ -110,9 +110,9 @@ export async function getSessionCounts(userId: string) {
     where: eq(sessions.initiatorId, userId),
   });
 
-  const active = userSessions.filter(s => s.status === 'active').length;
-  const completed = userSessions.filter(s => s.status === 'completed').length;
-  const paused = userSessions.filter(s => s.status === 'paused').length;
+  const active = userSessions.filter((s: { status: string }) => s.status === 'active').length;
+  const completed = userSessions.filter((s: { status: string }) => s.status === 'completed').length;
+  const paused = userSessions.filter((s: { status: string }) => s.status === 'paused').length;
 
   return { active, completed, paused, total: userSessions.length };
 }
@@ -153,4 +153,30 @@ export async function savePerspective(
     .returning();
 
   return created;
+}
+
+export async function getSessionForExport(sessionId: string) {
+  const session = await db.query.sessions.findFirst({
+    where: eq(sessions.id, sessionId),
+    with: {
+      partnership: {
+        with: {
+          user1: true,
+          user2: true,
+        },
+      },
+      initiator: true,
+      messages: {
+        orderBy: [messages.createdAt],
+      },
+      perspectives: {
+        with: {
+          user: true,
+        },
+      },
+      agreements: true,
+    },
+  });
+
+  return session;
 }
