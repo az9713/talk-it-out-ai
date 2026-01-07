@@ -4,6 +4,7 @@ import { createSession, getUserSessions } from '@/services/session';
 import { generateWelcome } from '@/lib/ai';
 import { addMessage } from '@/services/session';
 import { getTemplate, incrementTemplateUsage } from '@/services/templates';
+import { getMediatorSettings } from '@/services/mediator-settings';
 import { z } from 'zod';
 
 const createSessionSchema = z.object({
@@ -67,8 +68,11 @@ export async function POST(request: Request) {
       sessionTopic
     );
 
-    // Generate and save welcome message (with template context if available)
-    const welcomeMessage = await generateWelcome(templateContext || undefined);
+    // Get user's mediator personality settings
+    const personality = await getMediatorSettings(authSession.user.id);
+
+    // Generate and save welcome message (with template context and personality)
+    const welcomeMessage = await generateWelcome(templateContext || undefined, personality);
     await addMessage(newSession.id, null, 'assistant', welcomeMessage, 'intake');
 
     return NextResponse.json(newSession, { status: 201 });

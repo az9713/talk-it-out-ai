@@ -7,7 +7,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { User, Bell, Shield, Palette } from 'lucide-react';
+import { User, Bell, Shield, Palette, Bot, ChevronRight } from 'lucide-react';
+import Link from 'next/link';
 
 export default function SettingsPage() {
   const { data: session } = useSession();
@@ -54,6 +55,30 @@ export default function SettingsPage() {
             <Button className="mt-2">Save Changes</Button>
           </CardContent>
         </Card>
+
+        {/* AI Mediator Personality */}
+        <Link href="/dashboard/settings/mediator">
+          <Card className="cursor-pointer hover:border-rose-200 transition-colors">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Bot className="h-5 w-5 text-rose-500" />
+                  <CardTitle>AI Mediator Personality</CardTitle>
+                </div>
+                <ChevronRight className="h-5 w-5 text-gray-400" />
+              </div>
+              <CardDescription>
+                Customize how the AI mediator communicates with you
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-gray-600">
+                Adjust the tone, formality, and style of the AI mediator to match your preferences.
+                Choose from warm, professional, direct, or gentle communication styles.
+              </p>
+            </CardContent>
+          </Card>
+        </Link>
 
         {/* Notification Settings */}
         <Card>
