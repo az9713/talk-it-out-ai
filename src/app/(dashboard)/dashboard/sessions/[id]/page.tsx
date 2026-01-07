@@ -7,6 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Send, Bot, User, AlertTriangle } from 'lucide-react';
+import { ExportButton } from '@/components/export-button';
 
 interface Message {
   id: string;
@@ -98,6 +99,10 @@ export default function SessionPage() {
   return (
     <div className="flex flex-col h-[calc(100vh-8rem)]">
       <Card className="flex-1 flex flex-col overflow-hidden">
+        <div className="flex items-center justify-between p-4 border-b">
+          <h2 className="text-lg font-semibold">Session Chat</h2>
+          <ExportButton sessionId={sessionId} />
+        </div>
         <div className="flex-1 overflow-y-auto p-4" ref={scrollRef}>
           <div className="space-y-4 max-w-4xl mx-auto">
             {messages.map((message) => (
