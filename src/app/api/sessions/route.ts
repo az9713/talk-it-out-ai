@@ -3,11 +3,13 @@ import { auth } from '@/lib/auth';
 import { createSession, getUserSessions } from '@/services/session';
 import { generateWelcome } from '@/lib/ai';
 import { addMessage } from '@/services/session';
+import { getTemplate, incrementTemplateUsage } from '@/services/templates';
 import { z } from 'zod';
 
 const createSessionSchema = z.object({
   partnershipId: z.string().uuid().optional(),
   topic: z.string().min(1).max(500).optional(),
+  templateId: z.string().uuid().optional(),
 });
 
 export async function GET() {
@@ -42,17 +44,31 @@ export async function POST(request: Request) {
       );
     }
 
-    const { partnershipId, topic } = parsed.data;
+    const { partnershipId, topic, templateId } = parsed.data;
+
+    // Get template if provided
+    let sessionTopic = topic || 'New Session';
+    let templateContext: string | null = null;
+
+    if (templateId) {
+      const template = await getTemplate(templateId);
+      if (template) {
+        sessionTopic = template.name;
+        templateContext = template.promptContext;
+        // Increment usage count
+        await incrementTemplateUsage(templateId);
+      }
+    }
 
     // Create the session
     const newSession = await createSession(
       partnershipId || null,
       authSession.user.id,
-      topic || 'New Session'
+      sessionTopic
     );
 
-    // Generate and save welcome message
-    const welcomeMessage = await generateWelcome();
+    // Generate and save welcome message (with template context if available)
+    const welcomeMessage = await generateWelcome(templateContext || undefined);
     await addMessage(newSession.id, null, 'assistant', welcomeMessage, 'intake');
 
     return NextResponse.json(newSession, { status: 201 });

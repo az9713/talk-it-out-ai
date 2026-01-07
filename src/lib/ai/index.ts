@@ -156,8 +156,18 @@ function determineNextStage(currentStage: SessionStage, response: string): Sessi
   return currentStage;
 }
 
-export async function generateWelcome(): Promise<string> {
+export async function generateWelcome(templateContext?: string): Promise<string> {
   try {
+    let prompt = 'Start a new conflict resolution session. Greet the participants warmly and ask them to describe the situation they want to work through.';
+
+    if (templateContext) {
+      prompt = `Start a new conflict resolution session. The participant has indicated they want to discuss the following topic:
+
+"${templateContext}"
+
+Greet them warmly, acknowledge this topic, and ask them to share more details about their specific situation and how they're feeling about it. Be empathetic and create a safe space for them to open up.`;
+    }
+
     const response = await anthropic.messages.create({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 512,
@@ -165,7 +175,7 @@ export async function generateWelcome(): Promise<string> {
       messages: [
         {
           role: 'user',
-          content: 'Start a new conflict resolution session. Greet the participants warmly and ask them to describe the situation they want to work through.',
+          content: prompt,
         },
       ],
     });
