@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { getSession, addMessage, updateSessionStage, getSessionMessages } from '@/services/session';
 import { generateResponse } from '@/lib/ai';
+import { getMediatorSettings } from '@/services/mediator-settings';
 import { z } from 'zod';
 import type { Message } from '@/types';
 
@@ -69,6 +70,9 @@ export async function POST(
     // Get all messages for context
     const allMessages = await getSessionMessages(sessionId);
 
+    // Get user's mediator personality settings
+    const personality = await getMediatorSettings(authSession.user.id);
+
     // Generate AI response
     const aiResponse = await generateResponse(
       allMessages.map((m: { id: string; sessionId: string; userId: string | null; role: string; content: string; stage: string; createdAt: Date }) => ({
@@ -81,7 +85,8 @@ export async function POST(
         createdAt: m.createdAt,
       })),
       sessionData.stage,
-      content
+      content,
+      personality
     );
 
     // Save AI response

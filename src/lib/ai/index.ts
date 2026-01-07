@@ -1,5 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { SYSTEM_PROMPT, STAGE_PROMPTS, SAFETY_PROMPT, CRISIS_RESOURCES } from './prompts';
+import { buildPersonalityPrompt, DEFAULT_PERSONALITY, type MediatorPersonality } from './personality';
 import type { SessionStage, Message, AIResponse } from '@/types';
 
 const anthropic = new Anthropic({
@@ -41,7 +42,8 @@ export async function checkSafety(message: string): Promise<SafetyCheckResult> {
 export async function generateResponse(
   messages: Message[],
   currentStage: SessionStage,
-  userMessage: string
+  userMessage: string,
+  personality?: MediatorPersonality
 ): Promise<AIResponse> {
   // Check safety first
   const safetyCheck = await checkSafety(userMessage);
@@ -88,11 +90,16 @@ What feels right to you?`,
 
   const stagePrompt = STAGE_PROMPTS[currentStage] || '';
 
+  // Build personality modifier if provided
+  const personalityPrompt = personality
+    ? buildPersonalityPrompt(personality)
+    : buildPersonalityPrompt(DEFAULT_PERSONALITY);
+
   try {
     const response = await anthropic.messages.create({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 1024,
-      system: `${SYSTEM_PROMPT}\n\nCurrent stage: ${currentStage}\n\n${stagePrompt}`,
+      system: `${SYSTEM_PROMPT}\n\n${personalityPrompt}\n\nCurrent stage: ${currentStage}\n\n${stagePrompt}`,
       messages: conversationHistory,
     });
 
@@ -156,7 +163,10 @@ function determineNextStage(currentStage: SessionStage, response: string): Sessi
   return currentStage;
 }
 
-export async function generateWelcome(templateContext?: string): Promise<string> {
+export async function generateWelcome(
+  templateContext?: string,
+  personality?: MediatorPersonality
+): Promise<string> {
   try {
     let prompt = 'Start a new conflict resolution session. Greet the participants warmly and ask them to describe the situation they want to work through.';
 
@@ -168,10 +178,15 @@ export async function generateWelcome(templateContext?: string): Promise<string>
 Greet them warmly, acknowledge this topic, and ask them to share more details about their specific situation and how they're feeling about it. Be empathetic and create a safe space for them to open up.`;
     }
 
+    // Build personality modifier if provided
+    const personalityPrompt = personality
+      ? buildPersonalityPrompt(personality)
+      : buildPersonalityPrompt(DEFAULT_PERSONALITY);
+
     const response = await anthropic.messages.create({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 512,
-      system: SYSTEM_PROMPT,
+      system: `${SYSTEM_PROMPT}\n\n${personalityPrompt}`,
       messages: [
         {
           role: 'user',

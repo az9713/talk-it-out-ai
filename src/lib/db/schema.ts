@@ -49,6 +49,26 @@ export const templateCategoryEnum = pgEnum('template_category', [
   'other',
 ]);
 
+// Mediator personality enums
+export const mediatorToneEnum = pgEnum('mediator_tone', [
+  'warm',
+  'professional',
+  'direct',
+  'gentle',
+]);
+
+export const mediatorFormalityEnum = pgEnum('mediator_formality', [
+  'casual',
+  'balanced',
+  'formal',
+]);
+
+export const mediatorResponseLengthEnum = pgEnum('mediator_response_length', [
+  'concise',
+  'moderate',
+  'detailed',
+]);
+
 // Users table (for NextAuth)
 export const users = pgTable('users', {
   id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
@@ -150,8 +170,22 @@ export const sessionTemplates = pgTable('session_templates', {
   updatedAt: timestamp('updated_at', { mode: 'date' }).defaultNow().notNull(),
 });
 
+// Mediator settings table (per-user AI personality preferences)
+export const mediatorSettings = pgTable('mediator_settings', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }).unique(),
+  tone: mediatorToneEnum('tone').default('warm').notNull(),
+  formality: mediatorFormalityEnum('formality').default('balanced').notNull(),
+  responseLength: mediatorResponseLengthEnum('response_length').default('moderate').notNull(),
+  useEmoji: boolean('use_emoji').default(false).notNull(),
+  useMetaphors: boolean('use_metaphors').default(true).notNull(),
+  culturalContext: text('cultural_context'), // Optional cultural considerations
+  createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { mode: 'date' }).defaultNow().notNull(),
+});
+
 // Relations
-export const usersRelations = relations(users, ({ many }) => ({
+export const usersRelations = relations(users, ({ one, many }) => ({
   accounts: many(accounts),
   partnerships1: many(partnerships, { relationName: 'user1' }),
   partnerships2: many(partnerships, { relationName: 'user2' }),
@@ -159,6 +193,7 @@ export const usersRelations = relations(users, ({ many }) => ({
   perspectives: many(perspectives),
   messages: many(messages),
   templates: many(sessionTemplates),
+  mediatorSettings: one(mediatorSettings),
 }));
 
 export const partnershipsRelations = relations(partnerships, ({ one, many }) => ({
@@ -192,4 +227,8 @@ export const agreementsRelations = relations(agreements, ({ one }) => ({
 
 export const sessionTemplatesRelations = relations(sessionTemplates, ({ one }) => ({
   user: one(users, { fields: [sessionTemplates.userId], references: [users.id] }),
+}));
+
+export const mediatorSettingsRelations = relations(mediatorSettings, ({ one }) => ({
+  user: one(users, { fields: [mediatorSettings.userId], references: [users.id] }),
 }));
