@@ -1,7 +1,16 @@
 import Anthropic from '@anthropic-ai/sdk';
-import { SYSTEM_PROMPT, STAGE_PROMPTS, SAFETY_PROMPT, CRISIS_RESOURCES } from './prompts';
+import {
+  SYSTEM_PROMPT,
+  STAGE_PROMPTS,
+  SAFETY_PROMPT,
+  CRISIS_RESOURCES,
+  COLLABORATIVE_SYSTEM_PROMPT,
+  COLLABORATIVE_STAGE_PROMPTS,
+} from './prompts';
 import { buildPersonalityPrompt, DEFAULT_PERSONALITY, type MediatorPersonality } from './personality';
 import type { SessionStage, Message, AIResponse } from '@/types';
+
+export type SessionMode = 'solo' | 'collaborative';
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -43,7 +52,8 @@ export async function generateResponse(
   messages: Message[],
   currentStage: SessionStage,
   userMessage: string,
-  personality?: MediatorPersonality
+  personality?: MediatorPersonality,
+  sessionMode: SessionMode = 'solo'
 ): Promise<AIResponse> {
   // Check safety first
   const safetyCheck = await checkSafety(userMessage);
@@ -88,7 +98,11 @@ What feels right to you?`,
     content: userMessage,
   });
 
-  const stagePrompt = STAGE_PROMPTS[currentStage] || '';
+  // Select prompts based on session mode
+  const isCollaborative = sessionMode === 'collaborative';
+  const systemPrompt = isCollaborative ? COLLABORATIVE_SYSTEM_PROMPT : SYSTEM_PROMPT;
+  const stagePrompts = isCollaborative ? COLLABORATIVE_STAGE_PROMPTS : STAGE_PROMPTS;
+  const stagePrompt = stagePrompts[currentStage] || '';
 
   // Build personality modifier if provided
   const personalityPrompt = personality
@@ -99,7 +113,7 @@ What feels right to you?`,
     const response = await anthropic.messages.create({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 1024,
-      system: `${SYSTEM_PROMPT}\n\n${personalityPrompt}\n\nCurrent stage: ${currentStage}\n\n${stagePrompt}`,
+      system: `${systemPrompt}\n\n${personalityPrompt}\n\nCurrent stage: ${currentStage}\n\n${stagePrompt}`,
       messages: conversationHistory,
     });
 
@@ -165,17 +179,30 @@ function determineNextStage(currentStage: SessionStage, response: string): Sessi
 
 export async function generateWelcome(
   templateContext?: string,
-  personality?: MediatorPersonality
+  personality?: MediatorPersonality,
+  sessionMode: SessionMode = 'solo'
 ): Promise<string> {
-  try {
-    let prompt = 'Start a new conflict resolution session. Greet the participants warmly and ask them to describe the situation they want to work through.';
+  const isCollaborative = sessionMode === 'collaborative';
 
-    if (templateContext) {
-      prompt = `Start a new conflict resolution session. The participant has indicated they want to discuss the following topic:
+  try {
+    let prompt: string;
+
+    if (isCollaborative) {
+      prompt = templateContext
+        ? `Start a new collaborative conflict resolution session. Both participants are present. They want to discuss the following topic:
 
 "${templateContext}"
 
-Greet them warmly, acknowledge this topic, and ask them to share more details about their specific situation and how they're feeling about it. Be empathetic and create a safe space for them to open up.`;
+Welcome them both warmly by acknowledging they're here together to work through something important. Create a safe space and explain briefly how the process will work with both of them sharing their perspectives. Ask who would like to share their experience first.`
+        : 'Start a new collaborative conflict resolution session. Both participants are present. Welcome them warmly, acknowledge their courage in doing this together, and ask them to describe the situation they want to work through. Explain that each person will have a chance to share their perspective.';
+    } else {
+      prompt = templateContext
+        ? `Start a new conflict resolution session. The participant has indicated they want to discuss the following topic:
+
+"${templateContext}"
+
+Greet them warmly, acknowledge this topic, and ask them to share more details about their specific situation and how they're feeling about it. Be empathetic and create a safe space for them to open up.`
+        : 'Start a new conflict resolution session. Greet the participants warmly and ask them to describe the situation they want to work through.';
     }
 
     // Build personality modifier if provided
@@ -183,10 +210,13 @@ Greet them warmly, acknowledge this topic, and ask them to share more details ab
       ? buildPersonalityPrompt(personality)
       : buildPersonalityPrompt(DEFAULT_PERSONALITY);
 
+    // Select system prompt based on mode
+    const systemPrompt = isCollaborative ? COLLABORATIVE_SYSTEM_PROMPT : SYSTEM_PROMPT;
+
     const response = await anthropic.messages.create({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 512,
-      system: `${SYSTEM_PROMPT}\n\n${personalityPrompt}`,
+      system: `${systemPrompt}\n\n${personalityPrompt}`,
       messages: [
         {
           role: 'user',
@@ -198,6 +228,8 @@ Greet them warmly, acknowledge this topic, and ask them to share more details ab
     return response.content[0].type === 'text' ? response.content[0].text : '';
   } catch (error) {
     console.error('Welcome message error:', error);
-    return "Welcome! I'm here to help you work through a conflict using guided communication techniques. What situation would you like to discuss today?";
+    return isCollaborative
+      ? "Welcome to both of you! I'm here to help you work through this together using guided communication techniques. What situation would you like to discuss today?"
+      : "Welcome! I'm here to help you work through a conflict using guided communication techniques. What situation would you like to discuss today?";
   }
 }

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { getSession, addMessage, updateSessionStage, getSessionMessages } from '@/services/session';
-import { generateResponse } from '@/lib/ai';
+import { generateResponse, type SessionMode } from '@/lib/ai';
 import { getMediatorSettings } from '@/services/mediator-settings';
 import {
   triggerSessionEvent,
@@ -9,7 +9,6 @@ import {
   type NewMessagePayload,
 } from '@/lib/pusher/server';
 import { z } from 'zod';
-import type { Message } from '@/types';
 
 const sendMessageSchema = z.object({
   content: z.string().min(1).max(5000),
@@ -90,6 +89,9 @@ export async function POST(
     // Get user's mediator personality settings
     const personality = await getMediatorSettings(authSession.user.id);
 
+    // Get session mode (default to 'solo' for backwards compatibility)
+    const sessionMode: SessionMode = (sessionData.sessionMode as SessionMode) || 'solo';
+
     // Generate AI response
     const aiResponse = await generateResponse(
       allMessages.map((m: { id: string; sessionId: string; userId: string | null; role: string; content: string; stage: string; createdAt: Date }) => ({
@@ -103,7 +105,8 @@ export async function POST(
       })),
       sessionData.stage,
       content,
-      personality
+      personality,
+      sessionMode
     );
 
     // Save AI response
