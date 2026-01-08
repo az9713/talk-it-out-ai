@@ -3,6 +3,11 @@ import { auth } from '@/lib/auth';
 import { getSession, addMessage, updateSessionStage, getSessionMessages } from '@/services/session';
 import { generateResponse } from '@/lib/ai';
 import { getMediatorSettings } from '@/services/mediator-settings';
+import {
+  triggerSessionEvent,
+  PUSHER_EVENTS,
+  type NewMessagePayload,
+} from '@/lib/pusher/server';
 import { z } from 'zod';
 import type { Message } from '@/types';
 
@@ -67,6 +72,18 @@ export async function POST(
       sessionData.stage
     );
 
+    // Broadcast user message via Pusher
+    const userMessagePayload: NewMessagePayload = {
+      id: userMessage.id,
+      sessionId,
+      role: 'user',
+      content: userMessage.content,
+      userId: authSession.user.id,
+      userName: authSession.user.name || 'User',
+      createdAt: userMessage.createdAt.toISOString(),
+    };
+    await triggerSessionEvent(sessionId, PUSHER_EVENTS.NEW_MESSAGE, userMessagePayload);
+
     // Get all messages for context
     const allMessages = await getSessionMessages(sessionId);
 
@@ -97,6 +114,16 @@ export async function POST(
       aiResponse.message,
       aiResponse.nextStage || sessionData.stage
     );
+
+    // Broadcast AI response via Pusher
+    const assistantMessagePayload: NewMessagePayload = {
+      id: assistantMessage.id,
+      sessionId,
+      role: 'assistant',
+      content: assistantMessage.content,
+      createdAt: assistantMessage.createdAt.toISOString(),
+    };
+    await triggerSessionEvent(sessionId, PUSHER_EVENTS.NEW_MESSAGE, assistantMessagePayload);
 
     // Update stage if needed
     if (aiResponse.nextStage) {
