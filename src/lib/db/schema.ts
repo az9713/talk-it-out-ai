@@ -81,6 +81,30 @@ export const participantRoleEnum = pgEnum('participant_role', [
   'partner',
 ]);
 
+// Reminder type enum
+export const reminderTypeEnum = pgEnum('reminder_type', [
+  'follow_up',
+  'agreement_check',
+  'custom',
+]);
+
+// Reminder status enum
+export const reminderStatusEnum = pgEnum('reminder_status', [
+  'pending',
+  'sent',
+  'cancelled',
+  'failed',
+]);
+
+// Reminder frequency enum
+export const reminderFrequencyEnum = pgEnum('reminder_frequency', [
+  'daily',
+  'weekly',
+  'biweekly',
+  'monthly',
+  'custom',
+]);
+
 // Users table (for NextAuth)
 export const users = pgTable('users', {
   id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
@@ -212,6 +236,36 @@ export const mediatorSettings = pgTable('mediator_settings', {
   updatedAt: timestamp('updated_at', { mode: 'date' }).defaultNow().notNull(),
 });
 
+// User preferences table (notification and reminder settings)
+export const userPreferences = pgTable('user_preferences', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }).unique(),
+  emailReminders: boolean('email_reminders').default(true).notNull(),
+  reminderFrequency: reminderFrequencyEnum('reminder_frequency').default('weekly').notNull(),
+  defaultFollowUpDays: integer('default_follow_up_days').default(7).notNull(),
+  agreementCheckDays: integer('agreement_check_days').default(3).notNull(),
+  emailDigest: boolean('email_digest').default(false).notNull(), // Combine reminders into digest
+  quietHoursStart: integer('quiet_hours_start'), // Hour (0-23) to start quiet hours
+  quietHoursEnd: integer('quiet_hours_end'), // Hour (0-23) to end quiet hours
+  timezone: text('timezone').default('UTC'),
+  createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { mode: 'date' }).defaultNow().notNull(),
+});
+
+// Reminders table
+export const reminders = pgTable('reminders', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  sessionId: text('session_id').notNull().references(() => sessions.id, { onDelete: 'cascade' }),
+  type: reminderTypeEnum('type').notNull(),
+  status: reminderStatusEnum('status').default('pending').notNull(),
+  scheduledFor: timestamp('scheduled_for', { mode: 'date' }).notNull(),
+  sentAt: timestamp('sent_at', { mode: 'date' }),
+  message: text('message'), // Custom reminder message
+  metadata: text('metadata'), // JSON string for additional data
+  createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
+});
+
 // Relations
 export const usersRelations = relations(users, ({ one, many }) => ({
   accounts: many(accounts),
@@ -223,6 +277,8 @@ export const usersRelations = relations(users, ({ one, many }) => ({
   templates: many(sessionTemplates),
   mediatorSettings: one(mediatorSettings),
   sessionParticipations: many(sessionParticipants),
+  preferences: one(userPreferences),
+  reminders: many(reminders),
 }));
 
 export const partnershipsRelations = relations(partnerships, ({ one, many }) => ({
@@ -239,6 +295,7 @@ export const sessionsRelations = relations(sessions, ({ one, many }) => ({
   perspectives: many(perspectives),
   agreements: many(agreements),
   participants: many(sessionParticipants),
+  reminders: many(reminders),
 }));
 
 export const messagesRelations = relations(messages, ({ one }) => ({
@@ -266,4 +323,13 @@ export const sessionTemplatesRelations = relations(sessionTemplates, ({ one }) =
 
 export const mediatorSettingsRelations = relations(mediatorSettings, ({ one }) => ({
   user: one(users, { fields: [mediatorSettings.userId], references: [users.id] }),
+}));
+
+export const userPreferencesRelations = relations(userPreferences, ({ one }) => ({
+  user: one(users, { fields: [userPreferences.userId], references: [users.id] }),
+}));
+
+export const remindersRelations = relations(reminders, ({ one }) => ({
+  user: one(users, { fields: [reminders.userId], references: [users.id] }),
+  session: one(sessions, { fields: [reminders.sessionId], references: [sessions.id] }),
 }));

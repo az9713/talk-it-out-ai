@@ -12,6 +12,7 @@ import { ExportButton } from '@/components/export-button';
 import { SessionInviteDialog } from '@/components/session-invite-dialog';
 import { ParticipantPresence } from '@/components/participant-presence';
 import { SimpleVoiceInput } from '@/components/voice-input-button';
+import { ReminderScheduler } from '@/components/reminder-scheduler';
 import { useRealtimeMessages, useTypingIndicator, type RealtimeMessage } from '@/hooks/use-realtime-messages';
 
 interface Message {
@@ -201,6 +202,7 @@ export default function SessionPage() {
                 disabled={sessionData?.status !== 'active'}
               />
             )}
+            <ReminderScheduler sessionId={sessionId} />
             <ExportButton sessionId={sessionId} />
           </div>
         </div>

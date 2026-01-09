@@ -12,7 +12,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Heart, MessageCircle, Users, Settings, LogOut, Menu, X, FileText, BarChart3 } from 'lucide-react';
+import { Heart, MessageCircle, Users, Settings, LogOut, Menu, X, FileText, BarChart3, Bell } from 'lucide-react';
 import { useState } from 'react';
 
 interface DashboardNavProps {
@@ -128,6 +128,12 @@ export function DashboardNav({ user }: DashboardNavProps) {
                   <Link href="/dashboard/settings">
                     <Settings className="h-4 w-4 mr-2" />
                     Settings
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/dashboard/settings/reminders">
+                    <Bell className="h-4 w-4 mr-2" />
+                    Reminders
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem
