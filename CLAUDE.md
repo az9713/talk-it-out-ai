@@ -18,6 +18,7 @@ This file provides context for AI assistants (like Claude) working on this codeb
 | ORM | Drizzle ORM | Type-safe database queries |
 | Authentication | NextAuth.js v5 | User authentication |
 | AI | Anthropic Claude API | Conversation AI |
+| Email | Resend | Email notifications |
 | Language | TypeScript | Type-safe JavaScript |
 
 ## Project Structure
@@ -34,18 +35,37 @@ talk-it-out-ai/
 │   │   │       │   ├── page.tsx       # Sessions list
 │   │   │       │   ├── new/           # Create session
 │   │   │       │   └── [id]/          # Session detail/chat
+│   │   │       ├── templates/         # Session templates
+│   │   │       ├── analytics/         # Analytics dashboard
+│   │   │       ├── history/           # Session history & insights
+│   │   │       ├── goals/             # Goal tracking
 │   │   │       ├── partners/          # Partner management
 │   │   │       └── settings/          # User settings
+│   │   │           └── reminders/     # Reminder preferences
 │   │   ├── api/               # API routes
 │   │   │   ├── auth/          # Auth endpoints
 │   │   │   ├── sessions/      # Session CRUD + messages
-│   │   │   └── partnerships/  # Partnership endpoints
+│   │   │   ├── partnerships/  # Partnership endpoints
+│   │   │   ├── templates/     # Session templates
+│   │   │   ├── analytics/     # Analytics data
+│   │   │   ├── insights/      # Session insights
+│   │   │   ├── goals/         # Goal tracking
+│   │   │   ├── reminders/     # Reminder management
+│   │   │   └── cron/          # Scheduled tasks
 │   │   ├── layout.tsx         # Root layout
 │   │   └── page.tsx           # Landing page
 │   ├── components/            # React components
 │   │   ├── ui/               # shadcn/ui components
+│   │   ├── analytics/        # Analytics charts
 │   │   ├── dashboard-nav.tsx # Dashboard navigation
+│   │   ├── session-insights.tsx # Session insight components
+│   │   ├── goal-tracking.tsx # Goal tracking components
+│   │   ├── reminder-scheduler.tsx # Reminder UI
+│   │   ├── voice-input-button.tsx # Voice input
 │   │   └── providers.tsx     # Context providers
+│   ├── hooks/                # Custom React hooks
+│   │   ├── use-speech-recognition.ts # Web Speech API
+│   │   └── use-audio-recorder.ts     # Audio recording
 │   ├── lib/                  # Utilities and configs
 │   │   ├── ai/              # Claude AI integration
 │   │   │   ├── index.ts     # AI functions
@@ -53,11 +73,16 @@ talk-it-out-ai/
 │   │   ├── db/              # Database
 │   │   │   ├── index.ts     # DB connection
 │   │   │   └── schema.ts    # Drizzle schema
+│   │   ├── email/           # Email service (Resend)
 │   │   ├── auth.ts          # NextAuth config
 │   │   └── utils.ts         # Helper functions
 │   ├── services/            # Business logic
 │   │   ├── session.ts       # Session operations
-│   │   └── partnership.ts   # Partnership operations
+│   │   ├── partnership.ts   # Partnership operations
+│   │   ├── analytics.ts     # Analytics calculations
+│   │   ├── insights.ts      # Session insights
+│   │   ├── goals.ts         # Goal tracking
+│   │   └── reminders.ts     # Reminder management
 │   └── types/               # TypeScript types
 │       └── index.ts
 ├── docs/                    # Documentation
@@ -65,51 +90,98 @@ talk-it-out-ai/
 └── package.json
 ```
 
-## Key Files to Understand
+## Key Features
 
-### Database Schema (`src/lib/db/schema.ts`)
-Defines all database tables:
+### 1. Session Templates
+Pre-built templates for common conflict scenarios (household, finances, communication, parenting, work, boundaries, intimacy).
+
+### 2. Session Export
+Export session transcripts and summaries in multiple formats.
+
+### 3. Two-Person Collaborative Sessions
+- Invite partners to join sessions via invite code
+- Real-time participant tracking
+- Collaborative AI mediation prompts
+
+### 4. Analytics Dashboard
+- Session metrics and completion rates
+- Activity charts and trends
+- Topic categorization
+
+### 5. Customizable AI Mediator
+- Tone settings (warm, professional, direct, gentle)
+- Formality levels (casual, balanced, formal)
+- Response length preferences
+- Optional emoji and metaphor usage
+
+### 6. Voice Input & Audio Messages
+- Web Speech API for speech-to-text
+- MediaRecorder API fallback for Firefox
+- Voice input button in session chat
+
+### 7. Reflection Reminders & Follow-ups
+- Schedule follow-up reminders
+- Agreement check reminders
+- Email notifications via Resend
+- Customizable reminder preferences
+
+### 8. Session History & Insights
+- Timeline visualization of session progress
+- Breakthrough detection (agreements, reflections)
+- Communication pattern analysis
+- Theme analysis across sessions
+
+### 10. Goal Tracking & Progress
+- Set relationship goals with categories
+- Track progress with milestones (25%, 50%, 75%, 100%)
+- Celebration modals for achievements
+- Session-based goal tracking
+
+## Database Schema
+
+### Core Tables
 - `users` - User accounts
+- `accounts` - OAuth provider accounts
 - `sessions` - Conflict resolution sessions
 - `messages` - Chat messages within sessions
 - `partnerships` - User-to-user connections
 - `perspectives` - NVC components (observation, feeling, need, request)
 - `agreements` - Resolution agreements
 
-### AI Integration (`src/lib/ai/`)
-- `prompts.ts` - System prompts defining the AI mediator's behavior
-- `index.ts` - Functions for safety checks and response generation
+### Feature Tables
+- `sessionTemplates` - Pre-built session templates
+- `sessionParticipants` - Collaborative session participants
+- `mediatorSettings` - AI personality preferences per user
+- `userPreferences` - Notification and reminder settings
+- `reminders` - Scheduled reminders
+- `goals` - User relationship goals
+- `milestones` - Goal milestone achievements
 
-### Session Flow
-1. User creates session → `POST /api/sessions`
-2. AI generates welcome → `generateWelcome()`
-3. User sends message → `POST /api/sessions/[id]/messages`
-4. AI checks safety → `checkSafety()`
-5. AI responds → `generateResponse()`
-6. Session progresses through NVC stages
+## API Endpoints
 
-## Common Development Tasks
+### Sessions
+- `GET/POST /api/sessions` - List and create sessions
+- `GET/PUT /api/sessions/[id]` - Get and update session
+- `POST /api/sessions/[id]/messages` - Send message
+- `POST /api/sessions/[id]/export` - Export session
 
-### Adding a New API Endpoint
-1. Create file in `src/app/api/[endpoint]/route.ts`
-2. Export async functions: `GET`, `POST`, `PUT`, `DELETE`
-3. Use `auth()` for protected routes
-4. Return `NextResponse.json()`
+### Goals
+- `GET/POST /api/goals` - List and create goals
+- `GET/PUT/PATCH/DELETE /api/goals/[id]` - Goal management
 
-### Adding a New Page
-1. Create `page.tsx` in appropriate `src/app/` directory
-2. Use `'use client'` directive for client components
-3. Wrap with layout if needed
+### Reminders
+- `GET/POST /api/reminders` - List and create reminders
+- `DELETE /api/reminders/[id]` - Cancel reminder
 
-### Modifying Database Schema
-1. Edit `src/lib/db/schema.ts`
-2. Run `npx drizzle-kit push` to apply changes
-3. Update related services and types
+### Insights
+- `GET /api/insights` - Session history with stats
+- `GET /api/insights/sessions/[id]` - Session insights
 
-### Adding UI Components
-1. Use `npx shadcn@latest add [component]`
-2. Component appears in `src/components/ui/`
-3. Import and use in pages
+### Other
+- `GET /api/analytics` - Analytics data
+- `GET/POST /api/templates` - Session templates
+- `GET/PUT /api/settings/preferences` - User preferences
+- `GET/PUT /api/settings/mediator` - Mediator settings
 
 ## Environment Variables
 
@@ -119,6 +191,8 @@ DATABASE_URL=postgresql://...
 NEXTAUTH_SECRET=your-secret-key
 NEXTAUTH_URL=http://localhost:3000
 ANTHROPIC_API_KEY=sk-ant-...
+RESEND_API_KEY=re_... (optional, for email reminders)
+CRON_SECRET=your-cron-secret (for scheduled tasks)
 ```
 
 ## Running the Project
@@ -187,13 +261,6 @@ Currently no automated tests. When adding:
 - Use Jest for unit tests
 - Use Playwright for E2E tests
 - Test API routes with supertest
-
-## Known Limitations
-
-1. No real-time updates (polling or refresh needed)
-2. Single-user sessions (partner joining not fully implemented)
-3. No file attachments in messages
-4. No export/print session summaries
 
 ## Getting Help
 
