@@ -14,11 +14,18 @@ A complete guide to using Talk-It-Out-AI for conflict resolution and better comm
 8. [Session Stages Explained](#session-stages-explained)
 9. [Working with Partners](#working-with-partners)
 10. [Session Management](#session-management)
-11. [Settings and Preferences](#settings-and-preferences)
-12. [Tips for Effective Sessions](#tips-for-effective-sessions)
-13. [Safety Features](#safety-features)
-14. [Frequently Asked Questions](#frequently-asked-questions)
-15. [Troubleshooting](#troubleshooting)
+11. [Session Templates](#session-templates)
+12. [Analytics Dashboard](#analytics-dashboard)
+13. [Session History & Insights](#session-history--insights)
+14. [Goal Tracking](#goal-tracking)
+15. [Voice Input](#voice-input)
+16. [Reminders & Follow-ups](#reminders--follow-ups)
+17. [AI Mediator Customization](#ai-mediator-customization)
+18. [Settings and Preferences](#settings-and-preferences)
+19. [Tips for Effective Sessions](#tips-for-effective-sessions)
+20. [Safety Features](#safety-features)
+21. [Frequently Asked Questions](#frequently-asked-questions)
+22. [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -411,6 +418,321 @@ Go to **Sessions** page to see:
 Sessions automatically save your progress. You can:
 - Close the browser and return later
 - The session remains "Active" until completed
+
+---
+
+## Session Templates
+
+Templates help you quickly start sessions for common conflict scenarios.
+
+### Using a Template
+
+1. Go to **Templates** page from navigation
+2. Browse templates by category:
+   - Household
+   - Finances
+   - Communication
+   - Parenting
+   - Work
+   - Other
+3. Click on a template to preview
+4. Click **"Use Template"** to start a session with pre-filled context
+
+### System Templates
+
+The app includes built-in templates for common scenarios:
+- "Household Chores Division"
+- "Financial Decisions"
+- "Feeling Unheard"
+- "Work-Life Balance"
+- And more...
+
+### Creating Your Own Templates
+
+1. Go to **Templates** page
+2. Click **"Create Template"**
+3. Fill in:
+   - **Name**: A descriptive title
+   - **Category**: Choose from the list
+   - **Context**: The situation description
+   - **Suggested Opening**: Optional first message
+4. Click **Save**
+
+Your custom templates appear in "My Templates" section.
+
+---
+
+## Analytics Dashboard
+
+Track your conflict resolution progress and patterns over time.
+
+### Accessing Analytics
+
+Click **Analytics** in the navigation menu.
+
+### What You'll See
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    ANALYTICS DASHBOARD                          │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  Summary Cards:                                                  │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐           │
+│  │   Sessions   │  │  Completion  │  │   Average    │           │
+│  │     Total    │  │    Rate      │  │   Duration   │           │
+│  │      15      │  │     73%      │  │   22 min     │           │
+│  └──────────────┘  └──────────────┘  └──────────────┘           │
+│                                                                  │
+│  Charts:                                                         │
+│  - Sessions over time (line chart)                               │
+│  - Session outcomes (pie chart)                                  │
+│  - Common feelings identified                                    │
+│  - Common needs identified                                       │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Available Metrics
+
+- **Total Sessions**: Number of sessions started
+- **Completed Sessions**: Successfully resolved conflicts
+- **Completion Rate**: Percentage of sessions reaching agreement
+- **Average Duration**: Typical session length
+- **Sessions Over Time**: Monthly trend visualization
+- **Common Feelings**: Most frequently identified emotions
+- **Common Needs**: Most frequently identified underlying needs
+
+---
+
+## Session History & Insights
+
+Review past sessions and gain deeper understanding of your communication patterns.
+
+### Accessing History
+
+Click **History** in the navigation menu.
+
+### Session History View
+
+- See all your past sessions in chronological order
+- Filter by status (completed, active, paused)
+- Search by topic
+- View key statistics at a glance
+
+### Session Insights
+
+Click on any session to view detailed insights:
+
+#### Timeline
+Visual representation of how the conversation progressed through NVC stages.
+
+#### Key Breakthroughs
+Moments where significant understanding or progress was achieved.
+
+#### Communication Patterns
+Analysis of how you communicated during the session:
+- Tone patterns
+- Question types asked
+- Listening indicators
+
+#### NVC Perspectives
+Summary of your identified:
+- Observations
+- Feelings
+- Needs
+- Requests
+
+#### Agreements
+All agreements reached during the session.
+
+---
+
+## Goal Tracking
+
+Set relationship and communication goals, track progress, and celebrate achievements.
+
+### Accessing Goals
+
+Click **Goals** in the navigation menu.
+
+### Creating a Goal
+
+1. Click **"Create Goal"**
+2. Fill in:
+   - **Title**: What you want to achieve
+   - **Description**: More details about the goal
+   - **Category**: Select from:
+     - Communication
+     - Conflict Resolution
+     - Emotional Connection
+     - Trust Building
+     - Quality Time
+     - Boundaries
+     - Personal Growth
+     - Other
+   - **Target Date**: Optional deadline
+   - **Sessions Target**: Number of sessions to complete (optional)
+3. Click **Save**
+
+### Goal Progress
+
+Each goal shows:
+- Progress percentage
+- Milestones achieved
+- Sessions completed toward goal
+
+### Milestones
+
+Goals automatically have milestones at:
+- **25%** - Getting Started
+- **50%** - Halfway There
+- **75%** - Almost There
+- **100%** - Goal Achieved
+
+When you reach a milestone, you'll see a celebration!
+
+### Updating Progress
+
+Progress updates automatically when:
+- You complete sessions related to the goal
+- You manually update progress
+
+To manually update:
+1. Click on a goal
+2. Adjust the progress slider
+3. Save changes
+
+### Goal Status
+
+- **Active**: Currently working on
+- **Completed**: Successfully achieved
+- **Paused**: Temporarily on hold
+- **Abandoned**: No longer pursuing
+
+---
+
+## Voice Input
+
+Speak your messages instead of typing for a more natural conversation experience.
+
+### Using Voice Input
+
+1. In a session, click the **microphone icon** next to the message input
+2. Allow microphone access when prompted (first time only)
+3. Speak your message clearly
+4. The text will appear in the input field
+5. Edit if needed, then send
+
+### Voice Recording Indicator
+
+When recording:
+- The microphone icon pulses red
+- You'll see a timer showing recording duration
+- Click the stop button or microphone again to end recording
+
+### Tips for Voice Input
+
+- Speak clearly and at a natural pace
+- Pause briefly between sentences
+- Review the transcription before sending
+- Works best in quiet environments
+
+### Browser Compatibility
+
+Voice input works best in:
+- Google Chrome (recommended)
+- Microsoft Edge
+- Safari (macOS/iOS)
+
+Note: Firefox may have limited support.
+
+---
+
+## Reminders & Follow-ups
+
+Stay on track with your agreements through automated reminders.
+
+### Automatic Reminders
+
+After completing a session, the app can send reminders to:
+- Check on agreement progress
+- Schedule follow-up sessions
+- Reflect on what you've learned
+
+### Managing Reminders
+
+Go to a session's detail page to:
+- View scheduled reminders
+- Add custom reminders
+- Cancel upcoming reminders
+
+### Creating a Custom Reminder
+
+1. Open a completed session
+2. Click **"Schedule Reminder"**
+3. Choose when:
+   - Tomorrow
+   - In 3 days
+   - In 1 week
+   - In 1 month
+   - Custom date/time
+4. Add an optional note
+5. Click **Save**
+
+### Reminder Preferences
+
+In Settings, you can configure:
+- **Email reminders**: On/Off
+- **Reminder frequency**: Daily, Weekly, or Custom
+- **Default follow-up days**: How soon after session completion
+
+### Email Notifications
+
+Reminders are sent via email and include:
+- Session topic summary
+- Agreement highlights
+- Quick link to view the session
+
+---
+
+## AI Mediator Customization
+
+Personalize how the AI mediator communicates with you.
+
+### Accessing Mediator Settings
+
+Go to **Settings** → **Mediator Preferences**
+
+### Customization Options
+
+#### Tone
+- **Warm**: Caring, empathetic approach
+- **Professional**: Supportive but businesslike
+- **Direct**: Straightforward and to the point
+- **Gentle**: Extra nurturing for sensitive topics
+
+#### Formality
+- **Casual**: Friendly, conversational
+- **Balanced**: Mix of professional and friendly
+- **Formal**: Professional counselor style
+
+#### Response Length
+- **Concise**: Brief, focused responses
+- **Moderate**: Balanced explanations
+- **Detailed**: Thorough, comprehensive guidance
+
+#### Additional Options
+- **Use Emojis**: Include emojis in responses
+- **Use Metaphors**: Include illustrative comparisons
+
+### Preview
+
+As you adjust settings, see a live preview of how the mediator will respond with your preferences.
+
+### Reset to Defaults
+
+Click **"Reset to Defaults"** to restore original settings.
 
 ---
 

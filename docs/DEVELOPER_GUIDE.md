@@ -260,22 +260,71 @@ talk-it-out-ai/
 │   │   │       │   ├── page.tsx # /dashboard/sessions
 │   │   │       │   ├── new/
 │   │   │       │   │   └── page.tsx  # /dashboard/sessions/new
+│   │   │       │   ├── join/
+│   │   │       │   │   └── page.tsx  # /dashboard/sessions/join
 │   │   │       │   └── [id]/
 │   │   │       │       └── page.tsx  # /dashboard/sessions/abc123
+│   │   │       ├── templates/
+│   │   │       │   └── page.tsx # /dashboard/templates
+│   │   │       ├── analytics/
+│   │   │       │   └── page.tsx # /dashboard/analytics
+│   │   │       ├── history/
+│   │   │       │   ├── page.tsx # /dashboard/history
+│   │   │       │   └── [id]/
+│   │   │       │       └── page.tsx  # /dashboard/history/[id]
+│   │   │       ├── goals/
+│   │   │       │   └── page.tsx # /dashboard/goals
 │   │   │       ├── partners/
 │   │   │       │   └── page.tsx # /dashboard/partners
 │   │   │       └── settings/
-│   │   │           └── page.tsx # /dashboard/settings
+│   │   │           ├── page.tsx # /dashboard/settings
+│   │   │           └── mediator/
+│   │   │               └── page.tsx # /dashboard/settings/mediator
 │   │   ├── api/                 # API endpoints
 │   │   │   ├── auth/           # Auth API (handled by NextAuth)
 │   │   │   │   └── [...nextauth]/
 │   │   │   │       └── route.ts
 │   │   │   ├── sessions/       # Sessions API
 │   │   │   │   ├── route.ts    # GET /api/sessions, POST /api/sessions
+│   │   │   │   ├── join/
+│   │   │   │   │   └── route.ts # POST /api/sessions/join
 │   │   │   │   └── [id]/
 │   │   │   │       ├── route.ts    # GET /api/sessions/[id]
+│   │   │   │       ├── invite/
+│   │   │   │       │   └── route.ts # POST /api/sessions/[id]/invite
+│   │   │   │       ├── export/
+│   │   │   │       │   └── route.ts # GET /api/sessions/[id]/export
+│   │   │   │       ├── typing/
+│   │   │   │       │   └── route.ts # POST /api/sessions/[id]/typing
 │   │   │   │       └── messages/
 │   │   │   │           └── route.ts # POST /api/sessions/[id]/messages
+│   │   │   ├── templates/      # Templates API
+│   │   │   │   ├── route.ts    # GET/POST /api/templates
+│   │   │   │   └── [id]/
+│   │   │   │       └── route.ts # GET/PUT/DELETE /api/templates/[id]
+│   │   │   ├── analytics/      # Analytics API
+│   │   │   │   └── route.ts    # GET /api/analytics
+│   │   │   ├── insights/       # Session insights API
+│   │   │   │   ├── route.ts    # GET /api/insights
+│   │   │   │   └── sessions/
+│   │   │   │       └── [id]/
+│   │   │   │           └── route.ts # GET /api/insights/sessions/[id]
+│   │   │   ├── goals/          # Goals API
+│   │   │   │   ├── route.ts    # GET/POST /api/goals
+│   │   │   │   └── [id]/
+│   │   │   │       └── route.ts # GET/PUT/PATCH/DELETE /api/goals/[id]
+│   │   │   ├── reminders/      # Reminders API
+│   │   │   │   ├── route.ts    # GET/POST /api/reminders
+│   │   │   │   └── [id]/
+│   │   │   │       └── route.ts # DELETE /api/reminders/[id]
+│   │   │   ├── cron/           # Cron jobs
+│   │   │   │   └── reminders/
+│   │   │   │       └── route.ts # GET /api/cron/reminders
+│   │   │   ├── settings/       # Settings API
+│   │   │   │   ├── mediator/
+│   │   │   │   │   └── route.ts # GET/PUT /api/settings/mediator
+│   │   │   │   └── preferences/
+│   │   │   │       └── route.ts # GET/PUT /api/settings/preferences
 │   │   │   └── partnerships/   # Partnerships API
 │   │   │       └── route.ts
 │   │   ├── layout.tsx          # Root layout (wraps all pages)
@@ -286,21 +335,53 @@ talk-it-out-ai/
 │   │   │   ├── button.tsx
 │   │   │   ├── card.tsx
 │   │   │   ├── input.tsx
+│   │   │   ├── progress.tsx
 │   │   │   └── ...
-│   │   ├── dashboard-nav.tsx  # Dashboard navigation
-│   │   └── providers.tsx      # Context providers
+│   │   ├── analytics/         # Analytics components
+│   │   │   ├── stats-card.tsx
+│   │   │   ├── sessions-chart.tsx
+│   │   │   └── ...
+│   │   ├── session-insights.tsx  # Session insights components
+│   │   ├── goal-tracking.tsx     # Goal tracking components
+│   │   ├── template-card.tsx     # Template display card
+│   │   ├── voice-input-button.tsx # Voice input component
+│   │   ├── reminder-scheduler.tsx # Reminder scheduling
+│   │   ├── personality-preview.tsx # AI personality preview
+│   │   ├── dashboard-nav.tsx     # Dashboard navigation
+│   │   └── providers.tsx         # Context providers
+│   ├── hooks/                  # Custom React hooks
+│   │   ├── use-realtime-messages.ts  # WebSocket messaging
+│   │   ├── use-speech-recognition.ts # Voice input
+│   │   └── use-audio-recorder.ts     # Audio recording
 │   ├── lib/                   # Utilities and configs
 │   │   ├── ai/               # AI integration
 │   │   │   ├── index.ts      # AI functions
-│   │   │   └── prompts.ts    # System prompts
+│   │   │   ├── prompts.ts    # System prompts
+│   │   │   └── personality.ts # Personality customization
 │   │   ├── db/               # Database
 │   │   │   ├── index.ts      # DB connection
 │   │   │   └── schema.ts     # Database schema
+│   │   ├── email/            # Email integration
+│   │   │   ├── index.ts      # Resend setup
+│   │   │   └── templates/
+│   │   │       └── reminder.tsx # Email templates
+│   │   ├── export/           # Export functionality
+│   │   │   ├── pdf-template.tsx  # PDF generation
+│   │   │   └── markdown-template.ts
+│   │   ├── pusher.ts         # Server-side Pusher
+│   │   ├── pusher-client.ts  # Client-side Pusher
 │   │   ├── auth.ts           # NextAuth configuration
 │   │   └── utils.ts          # Helper functions
 │   ├── services/             # Business logic layer
 │   │   ├── session.ts        # Session operations
-│   │   └── partnership.ts    # Partnership operations
+│   │   ├── session-participants.ts # Collaborative sessions
+│   │   ├── partnership.ts    # Partnership operations
+│   │   ├── templates.ts      # Template operations
+│   │   ├── analytics.ts      # Analytics aggregation
+│   │   ├── insights.ts       # Session insights
+│   │   ├── goals.ts          # Goal tracking
+│   │   ├── reminders.ts      # Reminder operations
+│   │   └── mediator-settings.ts # AI personality settings
 │   └── types/                # TypeScript type definitions
 │       └── index.ts
 ├── docs/                     # Documentation
@@ -310,6 +391,7 @@ talk-it-out-ai/
 ├── next.config.ts           # Next.js configuration
 ├── package.json             # Dependencies and scripts
 ├── tailwind.config.ts       # Tailwind CSS configuration
+├── vercel.json              # Vercel cron configuration
 └── tsconfig.json            # TypeScript configuration
 ```
 
@@ -501,17 +583,32 @@ sessions (conflict resolution sessions)
 ├── topic
 ├── stage (intake, observation, feeling, need, request, etc.)
 ├── status (active, paused, completed, abandoned)
+├── sessionMode (solo, collaborative)
+├── inviteCode (unique, for partner joining)
+├── inviteExpiresAt
 ├── currentSpeakerId
 ├── createdAt
 └── updatedAt
+
+session_participants
+├── id (primary key)
+├── sessionId (foreign key → sessions)
+├── userId (foreign key → users)
+├── role (initiator, partner)
+├── joinedAt
+├── lastSeenAt
+└── isActive
 
 messages
 ├── id (primary key)
 ├── sessionId (foreign key → sessions)
 ├── userId (null for AI messages)
+├── senderId (foreign key → users, for collaborative)
 ├── role (user, assistant, system)
 ├── content
 ├── stage
+├── audioUrl (for voice messages)
+├── transcriptionSource (manual, web_speech, whisper)
 ├── createdAt
 └── updatedAt
 
@@ -543,6 +640,79 @@ agreements
 ├── agreedByUser2
 ├── createdAt
 └── updatedAt
+
+session_templates
+├── id (primary key)
+├── userId (foreign key → users, null for system templates)
+├── name
+├── description
+├── category (household, finances, communication, parenting, work, other)
+├── promptContext
+├── suggestedOpening
+├── isPublic
+├── usageCount
+├── createdAt
+└── updatedAt
+
+reminders
+├── id (primary key)
+├── userId (foreign key → users)
+├── sessionId (foreign key → sessions)
+├── type (follow_up, agreement_check, custom)
+├── scheduledFor
+├── sentAt
+├── status (pending, sent, cancelled, failed)
+├── message
+└── createdAt
+
+user_preferences
+├── id (primary key)
+├── userId (foreign key → users, unique)
+├── emailReminders
+├── reminderFrequency (daily, weekly, custom)
+├── defaultFollowUpDays
+├── createdAt
+└── updatedAt
+
+mediator_settings
+├── id (primary key)
+├── userId (foreign key → users, unique)
+├── tone (warm, professional, direct, gentle)
+├── formality (casual, balanced, formal)
+├── responseLength (concise, moderate, detailed)
+├── useEmoji
+├── useMetaphors
+├── culturalContext
+├── createdAt
+└── updatedAt
+
+goals
+├── id (primary key)
+├── userId (foreign key → users)
+├── title
+├── description
+├── category (communication, conflict_resolution, emotional_connection, trust_building, quality_time, boundaries, personal_growth, other)
+├── status (active, completed, paused, abandoned)
+├── targetDate
+├── progress (0-100)
+├── sessionsTarget
+├── sessionsCompleted
+├── celebrationShown
+├── createdAt
+├── updatedAt
+└── completedAt
+
+milestones
+├── id (primary key)
+├── goalId (foreign key → goals)
+├── userId (foreign key → users)
+├── title
+├── description
+├── targetProgress (0-100)
+├── isAchieved
+├── achievedAt
+├── celebrationShown
+└── createdAt
 ```
 
 ### Schema Definition (src/lib/db/schema.ts)
