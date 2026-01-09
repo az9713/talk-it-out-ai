@@ -11,6 +11,7 @@ import { Send, Bot, User, AlertTriangle, Wifi, WifiOff } from 'lucide-react';
 import { ExportButton } from '@/components/export-button';
 import { SessionInviteDialog } from '@/components/session-invite-dialog';
 import { ParticipantPresence } from '@/components/participant-presence';
+import { SimpleVoiceInput } from '@/components/voice-input-button';
 import { useRealtimeMessages, useTypingIndicator, type RealtimeMessage } from '@/hooks/use-realtime-messages';
 
 interface Message {
@@ -292,12 +293,21 @@ export default function SessionPage() {
               }}
               onBlur={stopTyping} // Stop typing when input loses focus
             />
-            <Button type="submit" disabled={loading || !input.trim()}>
-              <Send className="h-4 w-4" />
-            </Button>
+            <div className="flex flex-col gap-2">
+              <SimpleVoiceInput
+                onTranscript={(text) => {
+                  setInput((prev) => prev + (prev ? ' ' : '') + text);
+                  handleTyping();
+                }}
+                disabled={loading}
+              />
+              <Button type="submit" disabled={loading || !input.trim()}>
+                <Send className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
           <p className="text-xs text-gray-500 mt-2">
-            Press Enter to send, Shift+Enter for new line
+            Press Enter to send, Shift+Enter for new line, or use voice input
           </p>
         </form>
       </Card>
