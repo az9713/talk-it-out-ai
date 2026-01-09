@@ -1465,6 +1465,8 @@ npx web-push generate-vapid-keys
 
 All 10 features have been successfully implemented. Key implementation details:
 
+> **Note:** The last 4 features (#7 Reflection Reminders, #8 Session History & Insights, #9 Customizable AI Mediator, and #10 Goal Tracking) were implemented by Claude Code in the Claude iPhone app while the developer was taking a leisurely morning walk. The developer transcribed the requests via voice, Claude Code implemented the features and created the PRs, and the developer manually merged the PRs and deleted the branches—all from the phone. Three features were completed during the half-hour walk.
+
 ### Feature #1: Real-Time Messaging
 - Implemented with Pusher for WebSocket connections
 - Includes typing indicators and presence detection
