@@ -12,7 +12,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Heart, MessageCircle, Users, Settings, LogOut, Menu, X, FileText, BarChart3, Bell, History } from 'lucide-react';
+import { Heart, MessageCircle, Users, Settings, LogOut, Menu, X, FileText, BarChart3, Bell, History, Target } from 'lucide-react';
 import { useState } from 'react';
 
 interface DashboardNavProps {
@@ -29,6 +29,7 @@ const navItems = [
   { href: '/dashboard/templates', label: 'Templates', icon: FileText },
   { href: '/dashboard/analytics', label: 'Analytics', icon: BarChart3 },
   { href: '/dashboard/history', label: 'History', icon: History },
+  { href: '/dashboard/goals', label: 'Goals', icon: Target },
   { href: '/dashboard/partners', label: 'Partners', icon: Users },
   { href: '/dashboard/settings', label: 'Settings', icon: Settings },
 ];

@@ -105,6 +105,26 @@ export const reminderFrequencyEnum = pgEnum('reminder_frequency', [
   'custom',
 ]);
 
+// Goal category enum
+export const goalCategoryEnum = pgEnum('goal_category', [
+  'communication',
+  'conflict_resolution',
+  'emotional_connection',
+  'trust_building',
+  'quality_time',
+  'boundaries',
+  'personal_growth',
+  'other',
+]);
+
+// Goal status enum
+export const goalStatusEnum = pgEnum('goal_status', [
+  'active',
+  'completed',
+  'paused',
+  'abandoned',
+]);
+
 // Users table (for NextAuth)
 export const users = pgTable('users', {
   id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
@@ -266,6 +286,38 @@ export const reminders = pgTable('reminders', {
   createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
 });
 
+// Goals table
+export const goals = pgTable('goals', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  title: text('title').notNull(),
+  description: text('description'),
+  category: goalCategoryEnum('category').notNull(),
+  status: goalStatusEnum('status').default('active').notNull(),
+  targetDate: timestamp('target_date', { mode: 'date' }),
+  progress: integer('progress').default(0).notNull(), // 0-100 percentage
+  sessionsTarget: integer('sessions_target'), // Optional: target number of sessions
+  sessionsCompleted: integer('sessions_completed').default(0).notNull(),
+  celebrationShown: boolean('celebration_shown').default(false).notNull(),
+  createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { mode: 'date' }).defaultNow().notNull(),
+  completedAt: timestamp('completed_at', { mode: 'date' }),
+});
+
+// Milestones table (achievements for goals)
+export const milestones = pgTable('milestones', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  goalId: text('goal_id').notNull().references(() => goals.id, { onDelete: 'cascade' }),
+  userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  title: text('title').notNull(),
+  description: text('description'),
+  targetProgress: integer('target_progress').notNull(), // Progress percentage to unlock (e.g., 25, 50, 75, 100)
+  isAchieved: boolean('is_achieved').default(false).notNull(),
+  achievedAt: timestamp('achieved_at', { mode: 'date' }),
+  celebrationShown: boolean('celebration_shown').default(false).notNull(),
+  createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
+});
+
 // Relations
 export const usersRelations = relations(users, ({ one, many }) => ({
   accounts: many(accounts),
@@ -279,6 +331,8 @@ export const usersRelations = relations(users, ({ one, many }) => ({
   sessionParticipations: many(sessionParticipants),
   preferences: one(userPreferences),
   reminders: many(reminders),
+  goals: many(goals),
+  milestones: many(milestones),
 }));
 
 export const partnershipsRelations = relations(partnerships, ({ one, many }) => ({
@@ -332,4 +386,14 @@ export const userPreferencesRelations = relations(userPreferences, ({ one }) => 
 export const remindersRelations = relations(reminders, ({ one }) => ({
   user: one(users, { fields: [reminders.userId], references: [users.id] }),
   session: one(sessions, { fields: [reminders.sessionId], references: [sessions.id] }),
+}));
+
+export const goalsRelations = relations(goals, ({ one, many }) => ({
+  user: one(users, { fields: [goals.userId], references: [users.id] }),
+  milestones: many(milestones),
+}));
+
+export const milestonesRelations = relations(milestones, ({ one }) => ({
+  goal: one(goals, { fields: [milestones.goalId], references: [goals.id] }),
+  user: one(users, { fields: [milestones.userId], references: [users.id] }),
 }));
