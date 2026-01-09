@@ -69,6 +69,18 @@ export const mediatorResponseLengthEnum = pgEnum('mediator_response_length', [
   'detailed',
 ]);
 
+// Session mode enum
+export const sessionModeEnum = pgEnum('session_mode', [
+  'solo',
+  'collaborative',
+]);
+
+// Participant role enum
+export const participantRoleEnum = pgEnum('participant_role', [
+  'initiator',
+  'partner',
+]);
+
 // Users table (for NextAuth)
 export const users = pgTable('users', {
   id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
@@ -117,6 +129,10 @@ export const sessions = pgTable('sessions', {
   stage: sessionStageEnum('stage').default('intake').notNull(),
   status: sessionStatusEnum('status').default('active').notNull(),
   currentSpeakerId: text('current_speaker_id').references(() => users.id),
+  // Collaborative session fields
+  sessionMode: sessionModeEnum('session_mode').default('solo').notNull(),
+  inviteCode: text('invite_code').unique(),
+  inviteExpiresAt: timestamp('invite_expires_at', { mode: 'date' }),
   createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
   updatedAt: timestamp('updated_at', { mode: 'date' }).defaultNow().notNull(),
 });
@@ -153,6 +169,18 @@ export const agreements = pgTable('agreements', {
   agreedByUser1: boolean('agreed_by_user1').default(false).notNull(),
   agreedByUser2: boolean('agreed_by_user2').default(false).notNull(),
   createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
+});
+
+// Session participants table (for collaborative sessions)
+export const sessionParticipants = pgTable('session_participants', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  sessionId: text('session_id').notNull().references(() => sessions.id, { onDelete: 'cascade' }),
+  userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  role: participantRoleEnum('role').notNull(),
+  displayName: text('display_name'), // Optional display name for the session
+  joinedAt: timestamp('joined_at', { mode: 'date' }).defaultNow().notNull(),
+  lastSeenAt: timestamp('last_seen_at', { mode: 'date' }),
+  isActive: boolean('is_active').default(true).notNull(),
 });
 
 // Session templates table
@@ -194,6 +222,7 @@ export const usersRelations = relations(users, ({ one, many }) => ({
   messages: many(messages),
   templates: many(sessionTemplates),
   mediatorSettings: one(mediatorSettings),
+  sessionParticipations: many(sessionParticipants),
 }));
 
 export const partnershipsRelations = relations(partnerships, ({ one, many }) => ({
@@ -209,6 +238,7 @@ export const sessionsRelations = relations(sessions, ({ one, many }) => ({
   messages: many(messages),
   perspectives: many(perspectives),
   agreements: many(agreements),
+  participants: many(sessionParticipants),
 }));
 
 export const messagesRelations = relations(messages, ({ one }) => ({
@@ -223,6 +253,11 @@ export const perspectivesRelations = relations(perspectives, ({ one }) => ({
 
 export const agreementsRelations = relations(agreements, ({ one }) => ({
   session: one(sessions, { fields: [agreements.sessionId], references: [sessions.id] }),
+}));
+
+export const sessionParticipantsRelations = relations(sessionParticipants, ({ one }) => ({
+  session: one(sessions, { fields: [sessionParticipants.sessionId], references: [sessions.id] }),
+  user: one(users, { fields: [sessionParticipants.userId], references: [users.id] }),
 }));
 
 export const sessionTemplatesRelations = relations(sessionTemplates, ({ one }) => ({

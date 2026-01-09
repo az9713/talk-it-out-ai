@@ -2,12 +2,16 @@
 
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Send, Bot, User, AlertTriangle, Wifi, WifiOff } from 'lucide-react';
 import { ExportButton } from '@/components/export-button';
+import { SessionInviteDialog } from '@/components/session-invite-dialog';
+import { ParticipantPresence } from '@/components/participant-presence';
+import { SimpleVoiceInput } from '@/components/voice-input-button';
 import { useRealtimeMessages, useTypingIndicator, type RealtimeMessage } from '@/hooks/use-realtime-messages';
 
 interface Message {
@@ -18,9 +22,19 @@ interface Message {
   userId?: string | null;
 }
 
+interface SessionData {
+  id: string;
+  topic: string;
+  sessionMode: 'solo' | 'collaborative';
+  initiatorId: string;
+  status: string;
+}
+
 export default function SessionPage() {
   const params = useParams();
+  const { data: authSession } = useSession();
   const sessionId = params.id as string;
+  const [sessionData, setSessionData] = useState<SessionData | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -62,8 +76,27 @@ export default function SessionPage() {
   const { handleTyping, stopTyping } = useTypingIndicator(sendTypingIndicator);
 
   useEffect(() => {
+    fetchSessionData();
     fetchMessages();
   }, [sessionId]);
+
+  async function fetchSessionData() {
+    try {
+      const res = await fetch(`/api/sessions/${sessionId}`);
+      if (res.ok) {
+        const data = await res.json();
+        setSessionData({
+          id: data.id,
+          topic: data.topic,
+          sessionMode: data.sessionMode || 'solo',
+          initiatorId: data.initiatorId,
+          status: data.status,
+        });
+      }
+    } catch {
+      console.error('Failed to load session data');
+    }
+  }
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -151,8 +184,25 @@ export default function SessionPage() {
                 <WifiOff className="h-3 w-3" />
               </span>
             )}
+            {/* Participant presence for collaborative sessions */}
+            {authSession?.user?.id && (
+              <ParticipantPresence
+                sessionId={sessionId}
+                currentUserId={authSession.user.id}
+                typingUsers={typingUsers}
+              />
+            )}
           </div>
-          <ExportButton sessionId={sessionId} />
+          <div className="flex items-center gap-2">
+            {/* Show invite button only for session initiator */}
+            {sessionData?.initiatorId === authSession?.user?.id && (
+              <SessionInviteDialog
+                sessionId={sessionId}
+                disabled={sessionData?.status !== 'active'}
+              />
+            )}
+            <ExportButton sessionId={sessionId} />
+          </div>
         </div>
         <div className="flex-1 overflow-y-auto p-4" ref={scrollRef}>
           <div className="space-y-4 max-w-4xl mx-auto">
@@ -243,12 +293,21 @@ export default function SessionPage() {
               }}
               onBlur={stopTyping} // Stop typing when input loses focus
             />
-            <Button type="submit" disabled={loading || !input.trim()}>
-              <Send className="h-4 w-4" />
-            </Button>
+            <div className="flex flex-col gap-2">
+              <SimpleVoiceInput
+                onTranscript={(text) => {
+                  setInput((prev) => prev + (prev ? ' ' : '') + text);
+                  handleTyping();
+                }}
+                disabled={loading}
+              />
+              <Button type="submit" disabled={loading || !input.trim()}>
+                <Send className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
           <p className="text-xs text-gray-500 mt-2">
-            Press Enter to send, Shift+Enter for new line
+            Press Enter to send, Shift+Enter for new line, or use voice input
           </p>
         </form>
       </Card>
