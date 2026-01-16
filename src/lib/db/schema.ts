@@ -125,6 +125,31 @@ export const goalStatusEnum = pgEnum('goal_status', [
   'abandoned',
 ]);
 
+// Phase 1 Feature Enums
+
+// Emotion check-in type enum
+export const emotionCheckInTypeEnum = pgEnum('emotion_check_in_type', [
+  'pre_session',
+  'post_session',
+  'daily',
+]);
+
+// Session request status enum
+export const sessionRequestStatusEnum = pgEnum('session_request_status', [
+  'pending',
+  'accepted',
+  'declined',
+  'rescheduled',
+  'expired',
+]);
+
+// Session request urgency enum
+export const sessionRequestUrgencyEnum = pgEnum('session_request_urgency', [
+  'whenever',
+  'soon',
+  'important',
+]);
+
 // Users table (for NextAuth)
 export const users = pgTable('users', {
   id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
@@ -318,6 +343,62 @@ export const milestones = pgTable('milestones', {
   createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
 });
 
+// ============================================
+// PHASE 1 FEATURES
+// ============================================
+
+// Emotion Check-Ins table
+export const emotionCheckIns = pgTable('emotion_check_ins', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  sessionId: text('session_id').references(() => sessions.id, { onDelete: 'cascade' }), // null for daily check-ins
+  type: emotionCheckInTypeEnum('type').notNull(),
+  overallMood: integer('overall_mood').notNull(), // 1-5 scale
+  primaryEmotion: text('primary_emotion'), // angry, sad, anxious, happy, calm, etc.
+  feelings: text('feelings'), // JSON array of feelings
+  energyLevel: integer('energy_level'), // 1-5
+  opennessToTalk: integer('openness_to_talk'), // 1-5
+  note: text('note'),
+  createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
+});
+
+// Session Preparations table
+export const sessionPreparations = pgTable('session_preparations', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  sessionId: text('session_id').references(() => sessions.id, { onDelete: 'set null' }), // linked after session created
+  situation: text('situation'),
+  initialFeelings: text('initial_feelings'), // JSON array
+  desiredOutcome: text('desired_outcome'),
+  identifiedNeeds: text('identified_needs'), // JSON array
+  draftOpening: text('draft_opening'),
+  suggestedOpening: text('suggested_opening'), // AI-generated
+  concerns: text('concerns'),
+  isComplete: boolean('is_complete').default(false).notNull(),
+  shareWithMediator: boolean('share_with_mediator').default(true).notNull(),
+  createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { mode: 'date' }).defaultNow().notNull(),
+});
+
+// Session Requests table (Partner Session Request feature)
+export const sessionRequests = pgTable('session_requests', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  fromUserId: text('from_user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  toUserId: text('to_user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  partnershipId: text('partnership_id').notNull().references(() => partnerships.id, { onDelete: 'cascade' }),
+  topic: text('topic'), // optional topic hint
+  urgency: sessionRequestUrgencyEnum('urgency').default('whenever').notNull(),
+  message: text('message'), // optional personal message
+  suggestedTimes: text('suggested_times'), // JSON array of suggested times
+  status: sessionRequestStatusEnum('status').default('pending').notNull(),
+  responseMessage: text('response_message'),
+  scheduledFor: timestamp('scheduled_for', { mode: 'date' }),
+  sessionId: text('session_id').references(() => sessions.id, { onDelete: 'set null' }), // resulting session
+  createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
+  respondedAt: timestamp('responded_at', { mode: 'date' }),
+  expiresAt: timestamp('expires_at', { mode: 'date' }),
+});
+
 // Relations
 export const usersRelations = relations(users, ({ one, many }) => ({
   accounts: many(accounts),
@@ -333,6 +414,11 @@ export const usersRelations = relations(users, ({ one, many }) => ({
   reminders: many(reminders),
   goals: many(goals),
   milestones: many(milestones),
+  // Phase 1 relations
+  emotionCheckIns: many(emotionCheckIns),
+  sessionPreparations: many(sessionPreparations),
+  sentSessionRequests: many(sessionRequests, { relationName: 'sentRequests' }),
+  receivedSessionRequests: many(sessionRequests, { relationName: 'receivedRequests' }),
 }));
 
 export const partnershipsRelations = relations(partnerships, ({ one, many }) => ({
@@ -350,6 +436,9 @@ export const sessionsRelations = relations(sessions, ({ one, many }) => ({
   agreements: many(agreements),
   participants: many(sessionParticipants),
   reminders: many(reminders),
+  // Phase 1 relations
+  emotionCheckIns: many(emotionCheckIns),
+  preparations: many(sessionPreparations),
 }));
 
 export const messagesRelations = relations(messages, ({ one }) => ({
@@ -396,4 +485,23 @@ export const goalsRelations = relations(goals, ({ one, many }) => ({
 export const milestonesRelations = relations(milestones, ({ one }) => ({
   goal: one(goals, { fields: [milestones.goalId], references: [goals.id] }),
   user: one(users, { fields: [milestones.userId], references: [users.id] }),
+}));
+
+// Phase 1 Relations
+
+export const emotionCheckInsRelations = relations(emotionCheckIns, ({ one }) => ({
+  user: one(users, { fields: [emotionCheckIns.userId], references: [users.id] }),
+  session: one(sessions, { fields: [emotionCheckIns.sessionId], references: [sessions.id] }),
+}));
+
+export const sessionPreparationsRelations = relations(sessionPreparations, ({ one }) => ({
+  user: one(users, { fields: [sessionPreparations.userId], references: [users.id] }),
+  session: one(sessions, { fields: [sessionPreparations.sessionId], references: [sessions.id] }),
+}));
+
+export const sessionRequestsRelations = relations(sessionRequests, ({ one }) => ({
+  fromUser: one(users, { fields: [sessionRequests.fromUserId], references: [users.id], relationName: 'sentRequests' }),
+  toUser: one(users, { fields: [sessionRequests.toUserId], references: [users.id], relationName: 'receivedRequests' }),
+  partnership: one(partnerships, { fields: [sessionRequests.partnershipId], references: [partnerships.id] }),
+  session: one(sessions, { fields: [sessionRequests.sessionId], references: [sessions.id] }),
 }));
