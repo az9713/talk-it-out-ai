@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, boolean, pgEnum, integer } from 'drizzle-orm/pg-core';
+import { pgTable, text, timestamp, boolean, pgEnum, integer, real } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
 // Enums
@@ -148,6 +148,34 @@ export const sessionRequestUrgencyEnum = pgEnum('session_request_urgency', [
   'whenever',
   'soon',
   'important',
+]);
+
+// Phase 2 Feature Enums
+
+// Conflict pattern type enum
+export const patternTypeEnum = pgEnum('pattern_type', [
+  'recurring_topic',
+  'trigger',
+  'timing',
+  'communication_style',
+  'escalation_pattern',
+  'resolution_pattern',
+  'positive_pattern',
+]);
+
+// Calming exercise type enum
+export const exerciseTypeEnum = pgEnum('exercise_type', [
+  'breathing',
+  'grounding',
+  'visualization',
+  'body_scan',
+]);
+
+// Health score trend enum
+export const healthTrendEnum = pgEnum('health_trend', [
+  'improving',
+  'stable',
+  'declining',
 ]);
 
 // Users table (for NextAuth)
@@ -399,6 +427,82 @@ export const sessionRequests = pgTable('session_requests', {
   expiresAt: timestamp('expires_at', { mode: 'date' }),
 });
 
+// ============================================
+// PHASE 2 FEATURES
+// ============================================
+
+// Conflict Patterns table
+export const conflictPatterns = pgTable('conflict_patterns', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  partnershipId: text('partnership_id').references(() => partnerships.id, { onDelete: 'cascade' }),
+  type: patternTypeEnum('type').notNull(),
+  title: text('title').notNull(),
+  description: text('description').notNull(),
+  frequency: text('frequency'), // 'weekly', 'monthly', 'occasional'
+  severity: integer('severity'), // 1-5
+  relatedSessionIds: text('related_session_ids'), // JSON array of session IDs
+  exampleQuotes: text('example_quotes'), // JSON array of anonymized quotes
+  suggestions: text('suggestions'), // JSON array of actionable suggestions
+  confidence: real('confidence'), // 0-1
+  isAcknowledged: boolean('is_acknowledged').default(false).notNull(),
+  isResolved: boolean('is_resolved').default(false).notNull(),
+  detectedAt: timestamp('detected_at', { mode: 'date' }).defaultNow().notNull(),
+  lastOccurrence: timestamp('last_occurrence', { mode: 'date' }),
+});
+
+// Pattern Analysis Log table
+export const patternAnalysisLog = pgTable('pattern_analysis_log', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  sessionsAnalyzed: integer('sessions_analyzed'),
+  patternsFound: integer('patterns_found'),
+  analyzedAt: timestamp('analyzed_at', { mode: 'date' }).defaultNow().notNull(),
+});
+
+// Health Scores table
+export const healthScores = pgTable('health_scores', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  partnershipId: text('partnership_id').references(() => partnerships.id, { onDelete: 'cascade' }),
+  overallScore: integer('overall_score').notNull(), // 0-100
+  communicationScore: integer('communication_score'), // 0-100
+  resolutionScore: integer('resolution_score'), // 0-100
+  consistencyScore: integer('consistency_score'), // 0-100
+  progressScore: integer('progress_score'), // 0-100
+  emotionalScore: integer('emotional_score'), // 0-100
+  trend: healthTrendEnum('trend'),
+  trendPercentage: real('trend_percentage'),
+  factors: text('factors'), // JSON detailed breakdown
+  periodStart: timestamp('period_start', { mode: 'date' }).notNull(),
+  periodEnd: timestamp('period_end', { mode: 'date' }).notNull(),
+  calculatedAt: timestamp('calculated_at', { mode: 'date' }).defaultNow().notNull(),
+});
+
+// Calming Exercises table
+export const calmingExercises = pgTable('calming_exercises', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  name: text('name').notNull(),
+  description: text('description'),
+  type: exerciseTypeEnum('type').notNull(),
+  durationSeconds: integer('duration_seconds').notNull(),
+  instructions: text('instructions'), // JSON step-by-step
+  audioUrl: text('audio_url'),
+  isActive: boolean('is_active').default(true).notNull(),
+  createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
+});
+
+// Exercise Completions table
+export const exerciseCompletions = pgTable('exercise_completions', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  exerciseId: text('exercise_id').notNull().references(() => calmingExercises.id, { onDelete: 'cascade' }),
+  sessionId: text('session_id').references(() => sessions.id, { onDelete: 'set null' }), // if done before session
+  moodBefore: integer('mood_before'), // 1-5
+  moodAfter: integer('mood_after'), // 1-5
+  completedAt: timestamp('completed_at', { mode: 'date' }).defaultNow().notNull(),
+});
+
 // Relations
 export const usersRelations = relations(users, ({ one, many }) => ({
   accounts: many(accounts),
@@ -419,6 +523,10 @@ export const usersRelations = relations(users, ({ one, many }) => ({
   sessionPreparations: many(sessionPreparations),
   sentSessionRequests: many(sessionRequests, { relationName: 'sentRequests' }),
   receivedSessionRequests: many(sessionRequests, { relationName: 'receivedRequests' }),
+  // Phase 2 relations
+  conflictPatterns: many(conflictPatterns),
+  healthScores: many(healthScores),
+  exerciseCompletions: many(exerciseCompletions),
 }));
 
 export const partnershipsRelations = relations(partnerships, ({ one, many }) => ({
@@ -504,4 +612,30 @@ export const sessionRequestsRelations = relations(sessionRequests, ({ one }) => 
   toUser: one(users, { fields: [sessionRequests.toUserId], references: [users.id], relationName: 'receivedRequests' }),
   partnership: one(partnerships, { fields: [sessionRequests.partnershipId], references: [partnerships.id] }),
   session: one(sessions, { fields: [sessionRequests.sessionId], references: [sessions.id] }),
+}));
+
+// Phase 2 Relations
+
+export const conflictPatternsRelations = relations(conflictPatterns, ({ one }) => ({
+  user: one(users, { fields: [conflictPatterns.userId], references: [users.id] }),
+  partnership: one(partnerships, { fields: [conflictPatterns.partnershipId], references: [partnerships.id] }),
+}));
+
+export const patternAnalysisLogRelations = relations(patternAnalysisLog, ({ one }) => ({
+  user: one(users, { fields: [patternAnalysisLog.userId], references: [users.id] }),
+}));
+
+export const healthScoresRelations = relations(healthScores, ({ one }) => ({
+  user: one(users, { fields: [healthScores.userId], references: [users.id] }),
+  partnership: one(partnerships, { fields: [healthScores.partnershipId], references: [partnerships.id] }),
+}));
+
+export const calmingExercisesRelations = relations(calmingExercises, ({ many }) => ({
+  completions: many(exerciseCompletions),
+}));
+
+export const exerciseCompletionsRelations = relations(exerciseCompletions, ({ one }) => ({
+  user: one(users, { fields: [exerciseCompletions.userId], references: [users.id] }),
+  exercise: one(calmingExercises, { fields: [exerciseCompletions.exerciseId], references: [calmingExercises.id] }),
+  session: one(sessions, { fields: [exerciseCompletions.sessionId], references: [sessions.id] }),
 }));
